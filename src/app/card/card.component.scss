@@ -1,0 +1,50 @@
+:host {
+  height: calc(100vh - 64px);
+  display: grid;
+  grid-template-columns: auto;
+  grid-template-rows: auto;
+  justify-items: center;
+  align-items: center;
+
+  mat-card {
+    padding: 0;
+    min-width: 800px;
+    max-width: 95vw;
+
+    mat-toolbar {
+      height: 36px;
+      border-radius: inherit;
+      display: flex;
+      justify-content: space-between;
+      padding-right: 0;
+
+      .mat-h3 {
+        margin: 0;
+      }
+
+      button mat-icon svg {
+        fill: white;
+      }
+    }
+
+    mat-card-content {
+      margin-bottom: 0.75rem;
+    }
+
+    mat-card-actions {
+      display: flex;
+      flex-flow: row nowrap;
+      padding: 0 1.25rem 1.25rem;
+  
+      .item {
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: center;
+      }
+  
+      .item + .item {
+        margin-left: 0.75rem;
+      }
+    }
+  }
+}

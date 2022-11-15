@@ -1,0 +1,25 @@
+.mat-menu-panel.date-menu {
+  overflow: hidden;  
+
+  .mat-menu-content {
+    width: 280px;
+    padding: 0;
+
+    .label {
+      margin-top: 0.75rem;
+
+      .mat-h3 {
+        padding-left: 1.25rem;
+      }
+    }
+
+    .mat-calendar-header {
+      padding: 0px 8px 0 8px;
+
+      .mat-calendar-controls {
+        display: flex;
+        margin: 0 calc(4.7142857143% - 16px) 5%;
+      }
+    }
+  }
+}

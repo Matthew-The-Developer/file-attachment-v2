@@ -1,0 +1,93 @@
+
+<table mat-table [dataSource]="dataSource">
+  <ng-container matColumnDef="name">
+    <th mat-header-cell *matHeaderCellDef>Name</th>
+    <td mat-cell *matCellDef="let element">{{ element.name }}.{{ element.extension }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="status">
+    <th mat-header-cell *matHeaderCellDef>Status</th>
+    <td mat-cell *matCellDef="let element">
+      <mat-icon *ngIf="element.attachedToRecordID" color="primary">cloud</mat-icon>
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="size">
+    <th mat-header-cell *matHeaderCellDef>Size</th>
+    <td mat-cell *matCellDef="let element" class="size">{{ element.byteSize | fileSize }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="date">
+    <th mat-header-cell *matHeaderCellDef>Date</th>
+    <td mat-cell *matCellDef="let element">
+      <button 
+        mat-button
+        #dateMenuTrigger="matMenuTrigger"
+        [matMenuTriggerFor]="dateMenu"
+        [disabled]="dateChanging.has(element) && dateChanging.get(element)"
+        class="suffix-icon"
+      >
+        {{ element.documentDate | date:'shortDate' }}
+
+        <ng-container *ngIf="dateChanging.has(element) && dateChanging.get(element); else notChangingDate">
+          <mat-spinner diameter="16"></mat-spinner>
+        </ng-container>
+  
+        <ng-template #notChangingDate>
+          <mat-icon>today</mat-icon>
+        </ng-template>
+      </button>
+
+      <mat-menu #dateMenu="matMenu" class="date-menu">
+        <ng-template matMenuContent>
+          <div class="label">
+            <span class="mat-h3">{{ documentDateLabel }}</span>
+          </div>
+  
+          <div (click)="$event.stopPropagation()">
+            <mat-calendar 
+              (selectedChange)="fileDateChange(element, $event); dateMenuTrigger.closeMenu()"
+              [selected]="element.documentDate"
+            ></mat-calendar>
+          </div>
+        </ng-template>
+      </mat-menu>
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="group">
+    <th mat-header-cell *matHeaderCellDef>Group</th>
+    <td mat-cell *matCellDef="let element" class="size">{{ element.groupName }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="type">
+    <th mat-header-cell *matHeaderCellDef>Type</th>
+    <td mat-cell *matCellDef="let element">
+      <button mat-button class="suffix-icon">
+        {{ element.typeName }}<mat-icon>arrow_drop_down</mat-icon>
+      </button>
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="actions">
+    <th mat-header-cell *matHeaderCellDef>
+      <button mat-button color="accent">Select Files</button>
+    </th>
+    <td mat-cell *matCellDef="let element" class="size">
+      <button color="warn" class="square" mat-button>
+        <mat-icon>close</mat-icon>
+      </button>
+     
+      <button color="accent" class="square" mat-button>
+        <mat-icon>file_upload</mat-icon>
+      </button>
+    </td>
+  </ng-container>
+
+  <div *matNoDataRow class="no-data">
+    <mat-spinner diameter="24"></mat-spinner>
+  </div>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+</table>

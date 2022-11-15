@@ -1,0 +1,33 @@
+<mat-card>
+  <mat-toolbar color="primary">
+    <span class="mat-h3">Attach Files</span>
+    
+    <button mat-button>
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-toolbar>
+
+  <mat-card-content>
+    <app-file-attachment
+      [options]="options"
+      [groupIDs]="groupIDs"
+    ></app-file-attachment>
+  </mat-card-content>
+
+  <mat-card-actions>
+    <div class="item">
+      <mat-icon color="accent">account_circle</mat-icon>
+      <span class="mat-body">123456</span>
+    </div>
+
+    <div class="item">
+      <mat-icon color="accent">local_hospital</mat-icon>
+      <span class="mat-body">TN VALLEY HEALTHCARE TRANSPLANT, NASHVILLE, TN</span>
+    </div>
+
+    <span spacer></span>
+
+    <button mat-button>Cancel</button>
+    <button mat-flat-button color="primary">Attach All</button>
+  </mat-card-actions>
+</mat-card>

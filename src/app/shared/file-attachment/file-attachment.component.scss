@@ -1,0 +1,129 @@
+:host {
+  width: 100%;
+
+  display: grid;
+  grid-template-areas: 
+    "count select"
+    "table table"
+  ;
+  grid-template-columns: auto auto;
+  grid-template-rows: auto auto;
+  
+  .count {
+    grid-area: count;
+    justify-self: start;
+    margin: 0.5rem 0 0 1.5rem;
+    color: rgba(0, 0, 0, 0.54);
+  }
+
+  .select {
+    grid-area: select;
+    justify-self: end;
+    margin-right: 0.75rem;
+  }
+
+  table {
+    grid-area: table;
+    border-bottom-color: rgba(0, 0, 0, 0.12);
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+
+    tr.mat-header-row {
+      height: 36px;
+
+      th.mat-header-cell:first-of-type {
+        padding-left: 0.75rem;
+      }
+
+      th.mat-header-cell:last-of-type {
+        padding-right: 0.75rem;
+      }
+
+      th.mat-header-cell.cdk-column-status {
+        width: 44px;
+        padding: 0 0.5rem;
+        text-align: center;
+      }
+
+      th.mat-header-cell.cdk-column-date,
+      th.mat-header-cell.cdk-column-type {
+        padding-left: 1rem;
+      }
+
+      th.mat-header-cell.cdk-column-actions {
+        display: flex;
+        justify-content: flex-end;
+
+        button {
+          font-size: 12px;
+        }
+      }
+    }
+
+    tr.mat-row {
+
+
+      td.mat-cell {
+        border-bottom-width: unset;
+        border-bottom-style: unset;
+      }
+
+      td.mat-cell:first-of-type {
+        padding-left: 0.75rem;
+      }
+
+      td.mat-cell:last-of-type {
+        padding-right: 0.75rem;
+      }
+
+      td.mat-cell.cdk-column-status {
+        width: 44px;
+        padding: 0 0.5rem;
+        text-align: center;
+        
+        mat-icon {
+          height: 18px;
+          font-size: 18px;
+        }
+      }
+
+      td.mat-cell.cdk-column-date {
+        button {
+          mat-icon {
+            height: 22px;
+            font-size: 20px;
+            margin-left: 0.25rem;
+          }
+        }
+      }
+
+      td.mat-cell.cdk-column-type {
+        button {
+          mat-icon {
+            height: 22px;
+            font-size: 20px;
+          }
+        }
+      }
+
+      td.mat-cell.cdk-column-actions {
+        height: 48px;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+      }
+
+      td.mat-cell.size {
+        font-size: 12px;
+        font-weight: 500;
+        color: rgba(0, 0, 0, 0.54);
+      }
+    }
+
+    .no-data {
+      padding: 1rem 0;
+      display: flex;
+      justify-content: center;
+    }
+  }
+}
