@@ -1,5 +1,39 @@
 <mat-toolbar>
   <span>File Attachment v2.0</span>
+
+  <span spacer></span>
+
+  <button
+    mat-button
+    (click)="fileService.createFileSuccessful = !fileService.createFileSuccessful"
+    [color]="fileService.createFileSuccessful ? 'primary' : 'warn'"
+  >
+    File Create {{ fileService.createFileSuccessful ? 'Succeed' : 'Fail' }}
+  </button>
+
+  <button
+    mat-button
+    (click)="fileService.deleteFileSuccessful = !fileService.deleteFileSuccessful"
+    [color]="fileService.deleteFileSuccessful ? 'primary' : 'warn'"
+  >
+    File Delete {{ fileService.deleteFileSuccessful ? 'Succeed' : 'Fail' }}
+  </button>
+
+  <button
+    mat-button
+    (click)="fileService.updateDateSuccessful = !fileService.updateDateSuccessful"
+    [color]="fileService.updateDateSuccessful ? 'primary' : 'warn'"
+  >
+    Date Change {{ fileService.updateDateSuccessful ? 'Succeed' : 'Fail' }}
+  </button>
+
+  <button
+    mat-button
+    (click)="fileService.updateTypeSuccessful = !fileService.updateTypeSuccessful"
+    [color]="fileService.updateTypeSuccessful ? 'primary' : 'warn'"
+  >
+    Type Change {{ fileService.updateTypeSuccessful ? 'Succeed' : 'Fail' }}
+  </button>
 </mat-toolbar>
 
 <router-outlet></router-outlet>

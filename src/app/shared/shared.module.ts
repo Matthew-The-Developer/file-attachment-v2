@@ -7,13 +7,15 @@ import { SpacerDirective } from './directives/spacer.directive';
 import { CompactDirective } from './directives/compact.directive';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FileSizePipe } from './pipes/file-size.pipe';
+import { DeleteComfirmationDialogComponent } from './delete-comfirmation-dialog/delete-comfirmation-dialog.component';
 
 @NgModule({
   declarations: [
     FileAttachmentComponent,
     SpacerDirective,
     CompactDirective,
-    FileSizePipe
+    FileSizePipe,
+    DeleteComfirmationDialogComponent
   ],
   imports: [
     CommonModule,

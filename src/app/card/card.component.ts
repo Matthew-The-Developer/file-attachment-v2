@@ -8,7 +8,8 @@ import { FileRequestOptions } from '../models/file-request-options.model';
 })
 export class CardComponent implements OnInit {
   options: FileRequestOptions = { attachmentWorkItemID: 29 };
-  groupIDs = [ 0 ];
+  groupIDs = [ 10 ];
+  byteSizeLimit = 2 * 1024 * 1024;
 
   constructor() { }
 

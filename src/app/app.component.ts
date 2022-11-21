@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { FileService } from './services/file.service';
 
 @Component({
   selector: 'app-root',
@@ -7,4 +8,8 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'file-attachment-v2';
+
+  constructor(public fileService: FileService) { }
+
+
 }

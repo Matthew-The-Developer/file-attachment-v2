@@ -2,19 +2,31 @@
 <table mat-table [dataSource]="dataSource">
   <ng-container matColumnDef="name">
     <th mat-header-cell *matHeaderCellDef>Name</th>
-    <td mat-cell *matCellDef="let element">{{ element.name }}.{{ element.extension }}</td>
+    <td mat-cell *matCellDef="let element">
+      <span>{{ element.name }}.{{ element.extension }}</span>
+      
+      <ng-container *ngIf="invalidSize(element); else errors">
+        <br><mat-error>File size is larger than the limit of {{ byteSizeLimit! | fileSize }}</mat-error>
+      </ng-container>
+      
+      <ng-template #errors>
+        <ng-container *ngIf="hasError(element)">
+          <br><mat-error>{{ getError(element) }}</mat-error>
+        </ng-container>
+      </ng-template>
+    </td>
   </ng-container>
 
   <ng-container matColumnDef="status">
     <th mat-header-cell *matHeaderCellDef>Status</th>
     <td mat-cell *matCellDef="let element">
-      <mat-icon *ngIf="element.attachedToRecordID" color="primary">cloud</mat-icon>
+      <mat-icon *ngIf="isAttached(element)" color="primary">cloud</mat-icon>
     </td>
   </ng-container>
 
   <ng-container matColumnDef="size">
     <th mat-header-cell *matHeaderCellDef>Size</th>
-    <td mat-cell *matCellDef="let element" class="size">{{ element.byteSize | fileSize }}</td>
+    <td mat-cell *matCellDef="let element" [class.warn]="invalidSize(element)" class="size">{{ element.byteSize | fileSize }}</td>
   </ng-container>
 
   <ng-container matColumnDef="date">
@@ -24,12 +36,13 @@
         mat-button
         #dateMenuTrigger="matMenuTrigger"
         [matMenuTriggerFor]="dateMenu"
-        [disabled]="dateChanging.has(element) && dateChanging.get(element)"
+        [disabled]="invalidSize(element) || isChangingDate(element)"
+        [color]="dateChangeFailed(element) ? 'warn' : ''"
         class="suffix-icon"
       >
         {{ element.documentDate | date:'shortDate' }}
 
-        <ng-container *ngIf="dateChanging.has(element) && dateChanging.get(element); else notChangingDate">
+        <ng-container *ngIf="isChangingDate(element); else notChangingDate">
           <mat-spinner diameter="16"></mat-spinner>
         </ng-container>
   
@@ -46,7 +59,7 @@
   
           <div (click)="$event.stopPropagation()">
             <mat-calendar 
-              (selectedChange)="fileDateChange(element, $event); dateMenuTrigger.closeMenu()"
+              (selectedChange)="dateChange(element, $event); dateMenuTrigger.closeMenu()"
               [selected]="element.documentDate"
             ></mat-calendar>
           </div>
@@ -63,30 +76,158 @@
   <ng-container matColumnDef="type">
     <th mat-header-cell *matHeaderCellDef>Type</th>
     <td mat-cell *matCellDef="let element">
-      <button mat-button class="suffix-icon">
-        {{ element.typeName }}<mat-icon>arrow_drop_down</mat-icon>
+      <button 
+        mat-button
+        [matMenuTriggerFor]="groupMenu"
+        [disabled]="invalidSize(element) || isChangingType(element)"
+        [color]="typeChangeFailed(element) ? 'warn' : ''"
+        class="suffix-icon"
+      >
+        {{ element.typeName }}
+        <ng-container *ngIf="isChangingType(element); else notChangingType">
+          <mat-spinner diameter="16"></mat-spinner>
+        </ng-container>
+
+        <ng-template #notChangingType>
+          <mat-icon>arrow_drop_down</mat-icon>
+        </ng-template>
       </button>
+
+      <mat-menu #groupMenu="matMenu">
+        <ng-container *ngIf="!multipleAttachmentTypeGroups; else multipleGroups">
+          <button 
+            *ngFor="let type of (attachmentTypes$ | async)"
+            (click)="typeChange(element, type)"
+            mat-menu-item
+          >
+            {{ type.typeName }}
+          </button>
+        </ng-container>
+
+        <ng-template #multipleGroups>
+          <ng-container *ngFor="let group of attachmentTypeGroups$ | async">
+            <button mat-menu-item [matMenuTriggerFor]="typeMenu">{{ group.groupName }}</button>
+            <mat-menu #typeMenu="matMenu">
+              <button 
+                *ngFor="let type of group.types"
+                (click)="typeChange(element, type)"
+                mat-menu-item
+              >
+                {{ type.typeName }}
+              </button>
+            </mat-menu>
+          </ng-container>
+        </ng-template>
+      </mat-menu>
     </td>
   </ng-container>
 
   <ng-container matColumnDef="actions">
-    <th mat-header-cell *matHeaderCellDef>
-      <button mat-button color="accent">Select Files</button>
+    <th mat-header-cell *matHeaderCellDef [class.upload]="mode !== 1">
+      <button 
+        mat-button
+        (click)="fileInput.click()"
+        *ngIf="mode !== 1"
+        [disabled]="!(attachmentTypeGroups$ | async) || !(extensions$ | async)" 
+        color="accent"
+      >
+        <ng-container *ngIf="(attachmentTypeGroups$ | async) && (extensions$ | async); else loading">
+          Select Files
+        </ng-container>
+        
+        <ng-template #loading>
+          <mat-spinner diameter="18" color="accent"></mat-spinner>
+        </ng-template>
+      </button>
+
+      <input
+        #fileInput
+        (change)="select($event)"
+        [multiple]="!singleFile"
+        [accept]="acceptableExtensions$ | async"
+        type="file"
+        class="file-upload"
+        hidden
+      >
     </th>
     <td mat-cell *matCellDef="let element" class="size">
-      <button color="warn" class="square" mat-button>
-        <mat-icon>close</mat-icon>
-      </button>
-     
-      <button color="accent" class="square" mat-button>
-        <mat-icon>file_upload</mat-icon>
-      </button>
+      <ng-container *ngIf="isAttached(element); else notAttached">
+        <button
+          [matMenuTriggerFor]="actionMenu"
+          [disabled]="isDeleting(element)"
+          [color]="deleteFailed(element) ? 'warn' : ''"
+          color="primary"
+          class="square" 
+          mat-button
+        >
+          <ng-container *ngIf="isDeleting(element); else notDeleting">
+            <mat-spinner diameter="18" color="primary"></mat-spinner>
+          </ng-container>
+
+          <ng-template #notDeleting>
+            <mat-icon>more_horiz</mat-icon>
+          </ng-template>
+        </button>
+
+        <mat-menu #actionMenu="matMenu" xPosition="before">
+          <button mat-menu-item>
+            <mat-icon>file_download</mat-icon>
+            <span>Download</span>
+          </button>
+          <button (click)="delete(element)" mat-menu-item>
+            <mat-icon color="warn">delete</mat-icon>
+            <span>Delete</span>
+          </button>
+        </mat-menu>
+      </ng-container>
+
+      <ng-template #notAttached>
+        <button (click)="deselect(element)" color="warn" class="square" mat-button>
+          <mat-icon>close</mat-icon>
+        </button>
+       
+        <button
+          (click)="attach(element)"
+          [disabled]="invalidSize(element) || isAttaching(element)"
+          [color]="attachmentFailed(element) ? 'warn' : 'accent'"
+          class="square"
+          mat-button
+        >
+          <ng-container *ngIf="isAttaching(element); else notAttaching">
+            <mat-spinner diameter="18"></mat-spinner>
+          </ng-container>
+
+          <ng-template #notAttaching>
+            <mat-icon>file_upload</mat-icon>
+          </ng-template>
+        </button>
+      </ng-template>
     </td>
   </ng-container>
 
-  <div *matNoDataRow class="no-data">
-    <mat-spinner diameter="24"></mat-spinner>
-  </div>
+  <tr class="mat-row" *matNoDataRow>
+    <td class="mat-cell no-data" [attr.colspan]="displayedColumns.length">
+      <ng-container *ngIf="this.mode !== 0; else uploadOnly">
+        <ng-container *ngIf="!(existingFiles$ | async); else loaded">
+          <mat-spinner diameter="24"></mat-spinner>
+        </ng-container>
+
+        <ng-template #loaded>
+          No Files Attached
+        </ng-template>
+      </ng-container>
+
+      <ng-template #uploadOnly>
+        <ng-container *ngIf="!(attachmentTypeGroups$ | async) || !(extensions$ | async); else loaded">
+          <mat-spinner  diameter="24"></mat-spinner>
+        </ng-container>
+
+        <ng-template #loaded>
+          Select Files to Attach
+        </ng-template>
+      </ng-template>
+    </td>
+  </tr>
 
   <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
   <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
