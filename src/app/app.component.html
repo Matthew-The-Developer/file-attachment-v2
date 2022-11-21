@@ -5,34 +5,53 @@
 
   <button
     mat-button
+    [matMenuTriggerFor]="menu"
+    class="suffix-icon"
+  >
+    {{ fileModeName(fileService.fileMode) }}
+    <mat-icon>arrow_drop_down</mat-icon>
+  </button>
+
+  <mat-menu #menu="matMenu">
+    <button mat-menu-item (click)="fileService.fileMode = 0">Upload Only</button>
+    <button mat-menu-item (click)="fileService.fileMode = 1">Read Only</button>
+    <button mat-menu-item (click)="fileService.fileMode = 2">Read & Upload</button>
+  </mat-menu>
+
+  <button
+    mat-button
     (click)="fileService.createFileSuccessful = !fileService.createFileSuccessful"
     [color]="fileService.createFileSuccessful ? 'primary' : 'warn'"
+    class="square"
   >
-    File Create {{ fileService.createFileSuccessful ? 'Succeed' : 'Fail' }}
+    <mat-icon>file_upload</mat-icon>
   </button>
 
   <button
     mat-button
     (click)="fileService.deleteFileSuccessful = !fileService.deleteFileSuccessful"
     [color]="fileService.deleteFileSuccessful ? 'primary' : 'warn'"
+    class="square"
   >
-    File Delete {{ fileService.deleteFileSuccessful ? 'Succeed' : 'Fail' }}
+    <mat-icon>delete</mat-icon>
   </button>
 
   <button
     mat-button
     (click)="fileService.updateDateSuccessful = !fileService.updateDateSuccessful"
     [color]="fileService.updateDateSuccessful ? 'primary' : 'warn'"
+    class="square"
   >
-    Date Change {{ fileService.updateDateSuccessful ? 'Succeed' : 'Fail' }}
+    <mat-icon>today</mat-icon>
   </button>
 
   <button
     mat-button
     (click)="fileService.updateTypeSuccessful = !fileService.updateTypeSuccessful"
     [color]="fileService.updateTypeSuccessful ? 'primary' : 'warn'"
+    class="square"
   >
-    Type Change {{ fileService.updateTypeSuccessful ? 'Succeed' : 'Fail' }}
+    <mat-icon>label</mat-icon>
   </button>
 </mat-toolbar>
 

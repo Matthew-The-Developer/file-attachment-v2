@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, delay, map, mergeMap, Observable, of, throwError } from 'rxjs';
 import { FileExtension } from '../models/file-extension.model';
 import { FileGroupType } from '../models/file-group-type.model';
+import { FileMode } from '../models/file-mode.enum';
 import { FilePatient } from '../models/file-patient.model';
 import { FileRequestOptions } from '../models/file-request-options.model';
 
@@ -9,6 +10,7 @@ import { FileRequestOptions } from '../models/file-request-options.model';
   providedIn: 'root'
 })
 export class FileService {
+  fileMode: FileMode = FileMode.uploadonly;
   getFilesSuccessful: boolean = true;
   createFileSuccessful: boolean = true;
   deleteFileSuccessful: boolean = true;

@@ -36,13 +36,13 @@
         mat-button
         #dateMenuTrigger="matMenuTrigger"
         [matMenuTriggerFor]="dateMenu"
-        [disabled]="invalidSize(element) || isChangingDate(element)"
-        [color]="dateChangeFailed(element) ? 'warn' : ''"
+        [disabled]="invalidSize(element) || isLoading(element, 2)"
+        [color]="hasFailed(element, 2) ? 'warn' : ''"
         class="suffix-icon"
       >
         {{ element.documentDate | date:'shortDate' }}
 
-        <ng-container *ngIf="isChangingDate(element); else notChangingDate">
+        <ng-container *ngIf="isLoading(element, 2); else notChangingDate">
           <mat-spinner diameter="16"></mat-spinner>
         </ng-container>
   
@@ -79,12 +79,12 @@
       <button 
         mat-button
         [matMenuTriggerFor]="groupMenu"
-        [disabled]="invalidSize(element) || isChangingType(element)"
-        [color]="typeChangeFailed(element) ? 'warn' : ''"
+        [disabled]="invalidSize(element) || isLoading(element, 3)"
+        [color]="hasFailed(element, 3) ? 'warn' : ''"
         class="suffix-icon"
       >
         {{ element.typeName }}
-        <ng-container *ngIf="isChangingType(element); else notChangingType">
+        <ng-container *ngIf="isLoading(element, 3); else notChangingType">
           <mat-spinner diameter="16"></mat-spinner>
         </ng-container>
 
@@ -154,13 +154,13 @@
       <ng-container *ngIf="isAttached(element); else notAttached">
         <button
           [matMenuTriggerFor]="actionMenu"
-          [disabled]="isDeleting(element)"
-          [color]="deleteFailed(element) ? 'warn' : ''"
+          [disabled]="isLoading(element, 1)"
+          [color]="hasFailed(element, 1) ? 'warn' : ''"
           color="primary"
           class="square" 
           mat-button
         >
-          <ng-container *ngIf="isDeleting(element); else notDeleting">
+          <ng-container *ngIf="isLoading(element, 1); else notDeleting">
             <mat-spinner diameter="18" color="primary"></mat-spinner>
           </ng-container>
 
@@ -188,12 +188,12 @@
        
         <button
           (click)="attach(element)"
-          [disabled]="invalidSize(element) || isAttaching(element)"
-          [color]="attachmentFailed(element) ? 'warn' : 'accent'"
+          [disabled]="invalidSize(element) || isLoading(element, 0)"
+          [color]="hasFailed(element, 0) ? 'warn' : 'accent'"
           class="square"
           mat-button
         >
-          <ng-container *ngIf="isAttaching(element); else notAttaching">
+          <ng-container *ngIf="isLoading(element, 0); else notAttaching">
             <mat-spinner diameter="18"></mat-spinner>
           </ng-container>
 

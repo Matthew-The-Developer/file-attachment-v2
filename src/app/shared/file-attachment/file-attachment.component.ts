@@ -1,5 +1,5 @@
 import { DataSource } from '@angular/cdk/collections';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { BehaviorSubject, filter, map, Observable, ReplaySubject, tap } from 'rxjs';
 import { CallStatus } from 'src/app/models/call-status.enum';
@@ -18,7 +18,7 @@ import { DeleteComfirmationDialogComponent } from '../delete-comfirmation-dialog
   templateUrl: './file-attachment.component.html',
   styleUrls: ['./file-attachment.component.scss']
 })
-export class FileAttachmentComponent implements OnInit {
+export class FileAttachmentComponent implements OnInit, OnChanges {
   @Input() options!: FileRequestOptions;
   @Input() groupIDs!: number[];
   @Input() mode: FileMode = FileMode.uploadonly;
@@ -39,55 +39,17 @@ export class FileAttachmentComponent implements OnInit {
 
   fileState: Map<FilePatient, FileState> = new Map<FilePatient, FileState>();
 
-  attaching: Map<FilePatient, CallStatus> = new Map<FilePatient, CallStatus>();
-  deleting: Map<FilePatient, CallStatus> = new Map<FilePatient, CallStatus>();
-  dateChanging: Map<FilePatient, CallStatus> = new Map<FilePatient, CallStatus>();
-  typeChanging: Map<FilePatient, CallStatus> = new Map<FilePatient, CallStatus>();
-
   constructor(
     private fileService: FileService,
     public dialog: MatDialog,
   ) { }
 
   ngOnInit(): void {
-    if (this.showStatus) {
-      const index = this.displayedColumns.indexOf('size');
-      this.displayedColumns.splice(index, 0, 'status');
-    }
+    this.initialize();
+  }
 
-    this.fileService.getFileExtensions().subscribe(this._extensions);
-    this.fileService.getFileGroups(this.groupIDs).pipe(
-      filter(groups => !!groups),
-      map(groups => {
-        const names = new Map(groups!.map(group => [group.groupID, group.groupName]));
-        const typeGroups: FileTypeGroup[] = [];
-        Array.from(names.keys()).forEach(id => typeGroups.push({ groupName: names.get(id)!, types: groups!.filter(group => group.groupID === id) }));
-        return typeGroups;
-      }),
-      tap(groups => {
-        if (groups.length > 1) {
-          const index = this.displayedColumns.indexOf('type');
-          this.displayedColumns.splice(index, 0, 'group');
-        }
-      })
-    ).subscribe(this._attachmentTypeGroups);
-    
-    if (this.mode !== FileMode.uploadonly) {
-      this.fileService.getPatientFiles(this.options).subscribe(this._existingFiles);
-      this._existingFiles.pipe(val => val!!).subscribe(files => {
-        if (files) {
-          this.dataSource.setData([ ...this._selectedFiles.value, ...files ]);
-        }
-      });
-    }
-    
-    this._selectedFiles.subscribe(files => {
-      if (this._existingFiles.value) {
-        this.dataSource.setData([ ...files, ...this._existingFiles.value! ]);
-      } else {
-        this.dataSource.setData(files);
-      }
-    });
+  ngOnChanges(): void {
+    this.initialize();
   }
 
   get existingFiles$(): Observable<FilePatient[] | null> { return this._existingFiles.asObservable() }
@@ -145,80 +107,69 @@ export class FileAttachmentComponent implements OnInit {
   }
 
   invalidSize(file: FilePatient): boolean {
-    if (this.byteSizeLimit) {
+    if (this.byteSizeLimit && !file.attachedToRecordID) {
       return file.byteSize > this.byteSizeLimit;
     } else {
       return false;
     }
   }
 
-  isAttached(file: FilePatient): boolean {
-    return file.attachedToRecordID !== undefined;
-  }
-
+  isAttached(file: FilePatient): boolean { return file.attachedToRecordID !== undefined }
   attach(file: FilePatient): void {
-    this.loadFileAction(file, FileAction.Attach);
+    this.loading(file, FileAction.Attach);
 
     this.fileService.createPatientFile(file, this.options).subscribe(files => {
       if (this.mode !== FileMode.uploadonly) {
         this._existingFiles.next(files);
       }
-      this.succeedFileAction(file, FileAction.Attach);
+      this.success(file, FileAction.Attach);
       this.deselect(file);
     }, (error) => {
       console.log(error);
-      this.failFileAction(file, FileAction.Attach);
+      this.failure(file, FileAction.Attach);
     });
   }
-
-  isAttaching(file: FilePatient): boolean { return this.fileState.has(file) && this.fileState.get(file)!.loading !== undefined && this.fileState.get(file)!.loading!.includes(FileAction.Attach) }
-  attachmentFailed(file: FilePatient): boolean { return this.fileState.has(file) && this.fileState.get(file)!.failed === FileAction.Attach }
 
   delete(file: FilePatient): void {
     const dialogRef = this.dialog.open(DeleteComfirmationDialogComponent, { data: `${file.name}.${file.extension}` });
 
     dialogRef.afterClosed().pipe(filter(val => val!!)).subscribe(() => {
-      this.deleting.set(file, CallStatus.Loading);
+      this.loading(file, FileAction.Delete);
       this.fileService.deletePatientFile(file, this.options).subscribe(files => {
         this._existingFiles.next(files);
-        this.deleting.delete(file);
+        this.success(file, FileAction.Delete);
       }, (error) => {
         console.log(error);
-        this.deleting.set(file, CallStatus.Failure);
+        this.failure(file, FileAction.Delete);
       });
     });
   }
 
-  isDeleting(file: FilePatient): boolean { return this.deleting.has(file) && this.deleting.get(file) === CallStatus.Loading }
-  deleteFailed(file: FilePatient): boolean { return this.deleting.has(file) && this.deleting.get(file) === CallStatus.Failure }
-
   dateChange(file: FilePatient, date: Date): void {
     if (file.attachedToRecordID !== undefined) {
-      this.dateChanging.set(file, CallStatus.Loading);
+      this.loading(file, FileAction.ChangeDate);
       this.fileService.updatePatientFileDate(file, date, this.options).subscribe(files => {
         this._existingFiles.next(files);
-        this.dateChanging.delete(file);
+        this.success(file, FileAction.ChangeDate);
       }, (error) => {
         console.log(error);
-        this.dateChanging.set(file, CallStatus.Failure);
+        this.failure(file, FileAction.ChangeDate);
       });
     } else {
       file.documentDate = date;
     }
   }
 
-  isChangingDate(file: FilePatient): boolean { return this.dateChanging.has(file) && this.dateChanging.get(file) === CallStatus.Loading }
-  dateChangeFailed(file: FilePatient): boolean { return this.dateChanging.has(file) && this.dateChanging.get(file) === CallStatus.Failure }
 
   typeChange(file: FilePatient, type: FileGroupType): void {
     if (file.attachedToRecordID !== undefined) {
-      this.typeChanging.set(file, CallStatus.Loading);
+      this.loading(file, FileAction.ChangeType);
       this.fileService.updatePatientFileGroupType(file, type, this.options).subscribe(files => {
         this._existingFiles.next(files);
-        this.typeChanging.delete(file);
+        this.success(file, FileAction.ChangeType);
       }, (error) => {
         console.log(error);
-        this.typeChanging.set(file, CallStatus.Failure);
+        this.failure(file, FileAction.ChangeDate);
       });
     } else {
       file.groupTypeID = type.groupTypeID;
@@ -226,27 +177,11 @@ export class FileAttachmentComponent implements OnInit {
       file.typeName = type.typeName;
     }
   }
-  
-  isChangingType(file: FilePatient): boolean { return this.typeChanging.has(file) && this.typeChanging.get(file) === CallStatus.Loading }
-  typeChangeFailed(file: FilePatient): boolean { return this.typeChanging.has(file) && this.typeChanging.get(file) === CallStatus.Failure }
 
-  hasError(file: FilePatient): boolean { return this.attachmentFailed(file) || this.deleteFailed(file) || this.dateChangeFailed(file) || this.typeChangeFailed(file) }
+  isLoading(file: FilePatient, action: FileAction): boolean { return this.fileState.has(file) && this.fileState.get(file)!.loading !== undefined && this.fileState.get(file)!.loading!.includes(action) }
+  hasFailed(file: FilePatient, action: FileAction): boolean { return this.fileState.has(file) && this.fileState.get(file)!.failed === action }
+  hasError(file: FilePatient): boolean { return this.fileState.has(file) && this.fileState.get(file)!.failed !== undefined }
   getError(file: FilePatient): string {
-    if (this.attachmentFailed(file)) {
-      return 'Failed to attach file. Please try again';
-    } else if (this.deleteFailed(file)) {
-      return 'Failed to delete file. Please try again';
-    } else if (this.dateChangeFailed(file)) {
-      return 'Failed to update date. Please try again';
-    } else if (this.typeChangeFailed(file)) {
-      return 'Failed to update type. Please try again';
-    }
-
-    return '';
-  }
-
-  hasActionError(file: FilePatient): boolean { return this.fileState.has(file) && this.fileState.get(file)!.failed !== undefined }
-  getActionError(file: FilePatient): string {
     switch(this.fileState.get(file)!.failed) {
       case FileAction.Attach: return 'Failed to attach file. Please try again';
       case FileAction.Delete: return 'Failed to delete file. Please try again';
@@ -256,7 +191,54 @@ export class FileAttachmentComponent implements OnInit {
     }
   }
 
-  private loadFileAction(file: FilePatient, action: FileAction): void {
+  private initialize(): void {
+    this._attachmentTypeGroups = new BehaviorSubject<FileTypeGroup[] | null>(null);
+    this._extensions = new BehaviorSubject<FileExtension[] | null>(null);
+    this._selectedFiles = new BehaviorSubject<FilePatient[]>([]);
+    this._existingFiles = new BehaviorSubject<FilePatient[] | null>(null);
+    this.dataSource = new FileDataSource([]);
+
+    if (this.showStatus) {
+      const index = this.displayedColumns.indexOf('size');
+      this.displayedColumns.splice(index, 0, 'status');
+    }
+
+    this.fileService.getFileExtensions().subscribe(this._extensions);
+    this.fileService.getFileGroups(this.groupIDs).pipe(
+      filter(groups => !!groups),
+      map(groups => {
+        const names = new Map(groups!.map(group => [group.groupID, group.groupName]));
+        const typeGroups: FileTypeGroup[] = [];
+        Array.from(names.keys()).forEach(id => typeGroups.push({ groupName: names.get(id)!, types: groups!.filter(group => group.groupID === id) }));
+        return typeGroups;
+      }),
+      tap(groups => {
+        if (groups.length > 1) {
+          const index = this.displayedColumns.indexOf('type');
+          this.displayedColumns.splice(index, 0, 'group');
+        }
+      })
+    ).subscribe(this._attachmentTypeGroups);
+    
+    if (this.mode !== FileMode.uploadonly) {
+      this.fileService.getPatientFiles(this.options).subscribe(this._existingFiles);
+      this._existingFiles.pipe(val => val!!).subscribe(files => {
+        if (files) {
+          this.dataSource.setData([ ...this._selectedFiles.value, ...files ]);
+        }
+      });
+    }
+    
+    this._selectedFiles.subscribe(files => {
+      if (this._existingFiles.value) {
+        this.dataSource.setData([ ...files, ...this._existingFiles.value! ]);
+      } else {
+        this.dataSource.setData(files);
+      }
+    });
+  }
+
+  private loading(file: FilePatient, action: FileAction): void {
     if (this.fileState.has(file)) {
       const state = this.fileState.get(file);
       if (state!.loading) {
@@ -271,7 +253,7 @@ export class FileAttachmentComponent implements OnInit {
     }
   }
 
-  private succeedFileAction(file: FilePatient, action: FileAction): void {
+  private success(file: FilePatient, action: FileAction): void {
     const state = this.fileState.get(file);
     
     state!.loading = state!.loading!.filter(loadingAction => loadingAction !== action);
@@ -281,7 +263,7 @@ export class FileAttachmentComponent implements OnInit {
     }
   }
 
-  private failFileAction(file: FilePatient, action: FileAction): void {
+  private failure(file: FilePatient, action: FileAction): void {
     const state = this.fileState.get(file);
     state!.failed = action;
 
