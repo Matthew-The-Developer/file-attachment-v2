@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FileRequestOptions } from '../models/file-request-options.model';
 import { FileService } from '../services/file.service';
+import { FileAttachmentComponent } from '../shared/file-attachment/file-attachment.component';
 
 @Component({
   selector: 'app-card',
@@ -12,9 +13,14 @@ export class CardComponent implements OnInit {
   groupIDs = [ 10 ];
   byteSizeLimit = 2 * 1024 * 1024;
 
+  @ViewChild(FileAttachmentComponent) child!: FileAttachmentComponent;
+
   constructor(public fileService: FileService) { }
 
   ngOnInit(): void {
   }
 
+  attachAll(): void {
+    this.child.attachAll();
+  }
 }

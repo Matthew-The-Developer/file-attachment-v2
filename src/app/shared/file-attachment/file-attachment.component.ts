@@ -65,6 +65,12 @@ export class FileAttachmentComponent implements OnInit, OnChanges {
   get showStatus(): boolean { return this.mode === FileMode.readAndUpload }
   get multipleAttachmentTypeGroups(): boolean { return this._attachmentTypeGroups.value!.length > 1 }
 
+  public attachAll(): void {
+    const files = this._selectedFiles.value;
+
+    files.forEach(file => this.attach(file));
+  }
+
   select(event: any): void {
     if (event.target.files.length > 0) {
       const files: FilePatient[] = (Array.from(event.target.files) as File[]).map((file: File) => {
