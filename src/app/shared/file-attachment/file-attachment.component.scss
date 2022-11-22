@@ -80,6 +80,11 @@
 
       td.mat-cell.cdk-column-name {
         min-width: 120px;
+        max-width: 320px;
+
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
 
         mat-error {
           font-size: 12px;
@@ -130,6 +135,16 @@
         display: flex;
         justify-content: flex-end;
         align-items: center;
+      }
+
+      td.mat-cell .previewable {
+        text-decoration: underline;
+        cursor: pointer;
+      }
+
+      td.mat-cell .name {
+        white-space: nowrap;
+        text-overflow: ellipsis;
       }
 
       td.mat-cell.size {

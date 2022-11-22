@@ -12,6 +12,7 @@ import { FileRequestOptions } from 'src/app/models/file-request-options.model';
 import { FileState } from 'src/app/models/file-state.model';
 import { FileService } from 'src/app/services/file.service';
 import { DeleteComfirmationDialogComponent } from '../delete-comfirmation-dialog/delete-comfirmation-dialog.component';
+import { ImagePreviewDialogComponent } from '../image-preview-dialog/image-preview-dialog.component';
 
 @Component({
   selector: 'app-file-attachment',
@@ -68,7 +69,11 @@ export class FileAttachmentComponent implements OnInit, OnChanges {
   public attachAll(): void {
     const files = this._selectedFiles.value;
 
-    files.forEach(file => this.attach(file));
+    files.forEach(file => {
+      if (!this.hasInvalidSize(file)) {
+        this.attach(file);
+      }
+    });
   }
 
   select(event: any): void {
@@ -112,15 +117,6 @@ export class FileAttachmentComponent implements OnInit, OnChanges {
     this._selectedFiles.next(files.filter(file => file !== fileToRemove));
   }
 
-  invalidSize(file: FilePatient): boolean {
-    if (this.byteSizeLimit && !file.attachedToRecordID) {
-      return file.byteSize > this.byteSizeLimit;
-    } else {
-      return false;
-    }
-  }
-
-  isAttached(file: FilePatient): boolean { return file.attachedToRecordID !== undefined }
   attach(file: FilePatient): void {
     this.loading(file, FileAction.Attach);
 
@@ -184,6 +180,34 @@ export class FileAttachmentComponent implements OnInit, OnChanges {
     }
   }
 
+  preview(file: FilePatient): void {
+    if (this.isImage(file)) {
+      this.dialog.open(ImagePreviewDialogComponent, {
+        data: file,
+        hasBackdrop: true,
+        panelClass: 'image-preview-dialog',
+        maxHeight: '90vh',
+      });
+    } else if (this.isPDF(file)) {
+
+    }
+  }
+
+  name(file: FilePatient): string { return `${file.name}.${file.extension}` }
+  isAttached(file: FilePatient): boolean { return file.attachedToRecordID !== undefined }
+  isPreviewable(file: FilePatient): boolean { 
+    const extension = this._extensions.value!.find(extension => extension.extensionID === file.extensionID);
+    return !file.attachedToRecordID && extension!.isPreviewEnabled;
+  }
+  isImage(file: FilePatient): boolean {
+    const extension = this._extensions.value!.find(extension => extension.extensionID === file.extensionID);
+    return extension!.description.includes('image');
+  }
+  isPDF(file: FilePatient): boolean {
+    const extension = this._extensions.value!.find(extension => extension.extensionID === file.extensionID);
+    return extension!.description.includes('pdf');
+  }
+
   isLoading(file: FilePatient, action: FileAction): boolean { return this.fileState.has(file) && this.fileState.get(file)!.loading !== undefined && this.fileState.get(file)!.loading!.includes(action) }
   hasFailed(file: FilePatient, action: FileAction): boolean { return this.fileState.has(file) && this.fileState.get(file)!.failed === action }
   hasError(file: FilePatient): boolean { return this.fileState.has(file) && this.fileState.get(file)!.failed !== undefined }
@@ -194,6 +218,13 @@ export class FileAttachmentComponent implements OnInit, OnChanges {
       case FileAction.ChangeDate: return 'Failed to update date. Please try again';
       case FileAction.ChangeType: return 'Failed to update type. Please try again';
       default: return '';
+    }
+  }
+  hasInvalidSize(file: FilePatient): boolean {
+    if (this.byteSizeLimit && !file.attachedToRecordID) {
+      return file.byteSize > this.byteSizeLimit;
+    } else {
+      return false;
     }
   }
 

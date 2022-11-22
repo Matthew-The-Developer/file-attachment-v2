@@ -3,4 +3,5 @@ export interface FileExtension {
   extension: string;
   description: string;
   MIMEType: string;
+  isPreviewEnabled: boolean;
 }

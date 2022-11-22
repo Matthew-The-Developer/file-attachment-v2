@@ -1,0 +1,10 @@
+.image-preview-dialog .mat-dialog-container,
+.pdf-preview-dialog .mat-dialog-container {
+  overflow: hidden;
+  padding: 0;
+}
+
+.image-preview-dialog .mat-dialog-container .mat-dialog-content,
+.pdf-preview-dialog .mat-dialog-container .mat-dialog-content {
+  margin: 0;
+}

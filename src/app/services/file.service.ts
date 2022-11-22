@@ -153,14 +153,14 @@ export class FileService {
   ]);
 
   private _extensions: BehaviorSubject<FileExtension[]> = new BehaviorSubject<FileExtension[]>([
-    { extensionID: 0, extension: 'bmp', MIMEType: 'image/bmp', description: 'Standard Windows Bitmap image' },
-    { extensionID: 1, extension: 'gif', MIMEType: 'image/gif', description: 'Graphics interchange file format' },
-    { extensionID: 2, extension: 'jpeg', MIMEType: 'image/jpeg', description: 'JPEG bitmap image format file' },
-    { extensionID: 3, extension: 'jpg', MIMEType: 'image/jpeg', description: 'JPEG bitmap image format file' },
-    { extensionID: 4, extension: 'pdf', MIMEType: 'application/pdf', description: 'Adobe Portable document format' },
-    { extensionID: 5, extension: 'csv', MIMEType: 'application/vnd.ms-excel', description: 'Comma Separated Value file' },
-    { extensionID: 6, extension: 'doc', MIMEType: 'application/msword', description: 'Microsoft Word 97 to 2003 document file' },
-    { extensionID: 7, extension: 'docx', MIMEType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', description: 'Microsoft Word 2007/2010 Open XML document file' },
+    { extensionID: 0, extension: 'bmp', MIMEType: 'image/bmp', description: 'Standard Windows Bitmap image', isPreviewEnabled: true },
+    { extensionID: 1, extension: 'gif', MIMEType: 'image/gif', description: 'Graphics interchange file format', isPreviewEnabled: true },
+    { extensionID: 2, extension: 'jpeg', MIMEType: 'image/jpeg', description: 'JPEG bitmap image format file', isPreviewEnabled: true },
+    { extensionID: 3, extension: 'jpg', MIMEType: 'image/jpeg', description: 'JPEG bitmap image format file', isPreviewEnabled: true },
+    { extensionID: 4, extension: 'pdf', MIMEType: 'application/pdf', description: 'Adobe Portable document format', isPreviewEnabled: true },
+    { extensionID: 5, extension: 'csv', MIMEType: 'application/vnd.ms-excel', description: 'Comma Separated Value file', isPreviewEnabled: false },
+    { extensionID: 6, extension: 'doc', MIMEType: 'application/msword', description: 'Microsoft Word 97 to 2003 document file', isPreviewEnabled: false },
+    { extensionID: 7, extension: 'docx', MIMEType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', description: 'Microsoft Word 2007/2010 Open XML document file', isPreviewEnabled: false },
   ]);
 
   constructor() { }
@@ -218,7 +218,6 @@ export class FileService {
     } else {
       return this.getPatientFiles(options).pipe(delay(5000), mergeMap(t => throwError(() => new Error())));
     }
-
   }
 
   getFileGroups(groupIDs: number[] = []): Observable<FileGroupType[]> {
