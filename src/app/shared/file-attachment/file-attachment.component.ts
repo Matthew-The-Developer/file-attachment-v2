@@ -1,6 +1,7 @@
 import { DataSource } from '@angular/cdk/collections';
 import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { setupTestingRouter } from '@angular/router/testing';
 import { BehaviorSubject, filter, map, Observable, ReplaySubject, tap } from 'rxjs';
 import { CallStatus } from 'src/app/models/call-status.enum';
 import { FileAction } from 'src/app/models/file-action.enum';
@@ -227,6 +228,10 @@ export class FileAttachmentComponent implements OnInit, OnChanges {
       return false;
     }
   }
+  hasInvalidExtension(file: FilePatient): boolean {
+    const type = [ ... new Set(([] as FileGroupType[]).concat(...this._attachmentTypeGroups.value!.map(group => group.types))) ].find(type => type.groupTypeID === file.groupTypeID);
+    return !type!.extensionReference.map(ref => ref.extension).includes(file.extension);
+  }
 
   private initialize(): void {
     this._attachmentTypeGroups = new BehaviorSubject<FileTypeGroup[] | null>(null);
@@ -240,13 +245,16 @@ export class FileAttachmentComponent implements OnInit, OnChanges {
       this.displayedColumns.splice(index, 0, 'status');
     }
 
-    this.fileService.getFileExtensions().subscribe(this._extensions);
     this.fileService.getFileGroups(this.groupIDs).pipe(
-      filter(groups => !!groups),
-      map(groups => {
-        const names = new Map(groups!.map(group => [group.groupID, group.groupName]));
+      filter(groupTypes => !!groupTypes),
+      tap(groupTypes => {
+        const extensions = [ ... new Set(([] as FileExtension[]).concat(...groupTypes.map(groupType => groupType.extensionReference))) ];
+        this._extensions.next(extensions);
+      }),
+      map(groupTypes => {
+        const names = new Map(groupTypes!.map(groupType => [groupType.groupID, groupType.groupName]));
         const typeGroups: FileTypeGroup[] = [];
-        Array.from(names.keys()).forEach(id => typeGroups.push({ groupName: names.get(id)!, types: groups!.filter(group => group.groupID === id) }));
+        Array.from(names.keys()).forEach(id => typeGroups.push({ groupName: names.get(id)!, types: groupTypes!.filter(groupType => groupType.groupID === id) }));
         return typeGroups;
       }),
       tap(groups => {

@@ -15,10 +15,15 @@
         </span>
       </ng-template>
 
-      
-      <ng-container *ngIf="hasInvalidSize(element); else errors">
+      <ng-container *ngIf="hasInvalidSize(element); else invalidExtension">
         <br><mat-error>File size is larger than the limit of {{ byteSizeLimit! | fileSize }}</mat-error>
       </ng-container>
+
+      <ng-template #invalidExtension>
+        <ng-container *ngIf="hasInvalidExtension(element); else errors">
+          <br><mat-error>.{{ element.extension }} files is not allowed for {{ element.typeName }} attachments</mat-error>
+        </ng-container>
+      </ng-template>
       
       <ng-template #errors>
         <ng-container *ngIf="hasError(element)">
@@ -91,7 +96,7 @@
         mat-button
         [matMenuTriggerFor]="groupMenu"
         [disabled]="hasInvalidSize(element) || isLoading(element, 3)"
-        [color]="hasFailed(element, 3) ? 'warn' : ''"
+        [color]="hasFailed(element, 3) || hasInvalidExtension(element) ? 'warn' : ''"
         class="suffix-icon"
       >
         {{ element.typeName }}
@@ -104,15 +109,19 @@
         </ng-template>
       </button>
 
-      <mat-menu #groupMenu="matMenu">
+      <mat-menu #groupMenu="matMenu" class="group-type-menu">
         <ng-container *ngIf="!multipleAttachmentTypeGroups; else multipleGroups">
-          <button 
-            *ngFor="let type of (attachmentTypes$ | async)"
-            (click)="typeChange(element, type)"
-            mat-menu-item
-          >
-            {{ type.typeName }}
-          </button>
+          <ng-container *ngFor="let type of (attachmentTypes$ | async); let last = last">
+            <button 
+              (click)="typeChange(element, type)"
+              class="type"
+              mat-menu-item
+            >
+              {{ type.typeName }}
+              <br><mark *ngFor="let ref of type.extensionReference">{{ ref.extension }}</mark>
+            </button>
+            <mat-divider *ngIf="!last"></mat-divider>
+          </ng-container>
         </ng-container>
 
         <ng-template #multipleGroups>
@@ -122,9 +131,11 @@
               <button 
                 *ngFor="let type of group.types"
                 (click)="typeChange(element, type)"
+                class="type"
                 mat-menu-item
               >
                 {{ type.typeName }}
+                <br><mark *ngFor="let ref of type.extensionReference">{{ ref.extension }}</mark>
               </button>
             </mat-menu>
           </ng-container>
@@ -199,7 +210,7 @@
        
         <button
           (click)="attach(element)"
-          [disabled]="hasInvalidSize(element) || isLoading(element, 0)"
+          [disabled]="hasInvalidSize(element) || hasInvalidExtension(element) || isLoading(element, 0)"
           [color]="hasFailed(element, 0) ? 'warn' : 'accent'"
           class="square"
           mat-button
