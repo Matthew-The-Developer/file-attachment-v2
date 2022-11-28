@@ -25,22 +25,54 @@
 }
 
 .mat-menu-panel.group-type-menu {
-  button.mat-menu-item.type {
-    line-height: unset;
+  max-height: 320px;
+  overflow: overlay;
+  
+  .mat-menu-content {
+    padding-top: 0;
+    
 
-    mark {
+    .filter {
+      z-index: 1;
+      position: sticky;
+      top: 0;
+      background: white;
+
+      mat-form-field {
+        width: 100%;
+      }
+    }
+
+    .group {
+      padding: 0 16px;
+      font-weight: 500;
       font-size: 12px;
-      padding: 2px 3px;
-      border-radius: 4px;
-      background: rgba($color: #000000, $alpha: 0.14);
-      color: rgba($color: #000000, $alpha: 0.54);
-      text-overflow: none;
+      color: #0c2678;
     }
-    mark:first-child {
-      margin-right: 2px;
+  
+    button.mat-menu-item[disabled].type {
+      mark {
+        background: rgba($color: #000000, $alpha: 0.08);
+        color: rgba($color: #000000, $alpha: 0.38);
+      }
     }
-    mark + mark {
-      margin: 0 2px;
+    button.mat-menu-item.type {
+      line-height: unset;
+
+      mark {
+        font-size: 12px;
+        padding: 2px 3px;
+        border-radius: 4px;
+        background: rgba($color: #000000, $alpha: 0.14);
+        color: rgba($color: #000000, $alpha: 0.54);
+        text-overflow: none;
+      }
+      mark:first-child {
+        margin-right: 2px;
+      }
+      mark + mark {
+        margin: 0 2px;
+      }
     }
   }
 }

@@ -109,11 +109,12 @@
         </ng-template>
       </button>
 
-      <mat-menu #groupMenu="matMenu" class="group-type-menu">
+      <mat-menu #groupMenu="matMenu" (closed)="clear()" yPosition="below" class="group-type-menu">
         <ng-container *ngIf="!multipleAttachmentTypeGroups; else multipleGroups">
           <ng-container *ngFor="let type of (attachmentTypes$ | async); let last = last">
             <button 
               (click)="typeChange(element, type)"
+              [disabled]="isInvalidExtension(element, type)"
               class="type"
               mat-menu-item
             >
@@ -125,19 +126,25 @@
         </ng-container>
 
         <ng-template #multipleGroups>
-          <ng-container *ngFor="let group of attachmentTypeGroups$ | async">
-            <button mat-menu-item [matMenuTriggerFor]="typeMenu">{{ group.groupName }}</button>
-            <mat-menu #typeMenu="matMenu">
-              <button 
-                *ngFor="let type of group.types"
-                (click)="typeChange(element, type)"
-                class="type"
-                mat-menu-item
-              >
-                {{ type.typeName }}
-                <br><mark *ngFor="let ref of type.extensionReference">{{ ref.extension }}</mark>
-              </button>
-            </mat-menu>
+          <div (click)="$event.stopPropagation()" class="filter">
+            <mat-form-field appearance="fill" compact>
+              <mat-label>Attachment Type</mat-label>
+              <input [formControl]="filterControl" autocomplete="off" matInput>
+            </mat-form-field>
+          </div>
+          
+          <ng-container *ngFor="let group of filteredTypeGroups$ | async">
+            <span class="group">{{ group.groupName }}</span>
+            <button 
+              *ngFor="let type of group.types"
+              (click)="typeChange(element, type)"
+              [disabled]="isInvalidExtension(element, type)"
+              class="type"
+              mat-menu-item
+            >
+              {{ type.typeName }}
+              <br><mark *ngFor="let ref of type.extensionReference">{{ ref.extension }}</mark>
+            </button>
           </ng-container>
         </ng-template>
       </mat-menu>

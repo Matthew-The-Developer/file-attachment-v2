@@ -1,8 +1,9 @@
 import { DataSource } from '@angular/cdk/collections';
 import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { setupTestingRouter } from '@angular/router/testing';
-import { BehaviorSubject, filter, map, Observable, ReplaySubject, tap } from 'rxjs';
+import { BehaviorSubject, filter, forkJoin, map, Observable, ReplaySubject, tap, withLatestFrom } from 'rxjs';
 import { CallStatus } from 'src/app/models/call-status.enum';
 import { FileAction } from 'src/app/models/file-action.enum';
 import { FileExtension } from 'src/app/models/file-extension.model';
@@ -39,6 +40,9 @@ export class FileAttachmentComponent implements OnInit, OnChanges {
   _existingFiles: BehaviorSubject<FilePatient[] | null> = new BehaviorSubject<FilePatient[] | null>(null);
   dataSource: FileDataSource = new FileDataSource([]);
 
+  _filter: BehaviorSubject<string> = new BehaviorSubject<string>('');
+  filterControl: FormControl = new FormControl();
+
   fileState: Map<FilePatient, FileState> = new Map<FilePatient, FileState>();
 
   constructor(
@@ -56,6 +60,20 @@ export class FileAttachmentComponent implements OnInit, OnChanges {
 
   get existingFiles$(): Observable<FilePatient[] | null> { return this._existingFiles.asObservable() }
   get attachmentTypeGroups$(): Observable<FileTypeGroup[] | null> { return this._attachmentTypeGroups.asObservable() }
+  get filteredTypeGroups$(): Observable<FileTypeGroup[] | null> { 
+    return this._attachmentTypeGroups.asObservable().pipe(
+      withLatestFrom(this._filter, (groups, filter) => {
+        
+        if (groups && filter) {
+          const filteredGroups = [ ...groups.map(group => ({ ...group })) ];
+          filteredGroups.forEach(group => group.types = group.types.filter((type) => type.typeName.toLowerCase().includes(filter.toLowerCase()) || type.groupName.toLowerCase().includes(filter.toLowerCase())));
+          return filteredGroups.filter(group => group.types.length > 0);
+        } else {
+          return groups;
+        }
+      })
+    );
+  }
   get attachmentTypes$(): Observable<FileGroupType[]> { return this._attachmentTypeGroups.pipe(val => val!!, map(groups => groups![0].types)) }
   get extensions$(): Observable<FileExtension[] | null> { return this._extensions.asObservable() }
   get acceptableExtensions$(): Observable<string> { 
@@ -194,6 +212,10 @@ export class FileAttachmentComponent implements OnInit, OnChanges {
     }
   }
 
+  clear() {
+    this.filterControl.reset();
+  }
+
   name(file: FilePatient): string { return `${file.name}.${file.extension}` }
   isAttached(file: FilePatient): boolean { return file.attachedToRecordID !== undefined }
   isPreviewable(file: FilePatient): boolean { 
@@ -232,6 +254,9 @@ export class FileAttachmentComponent implements OnInit, OnChanges {
     const type = [ ... new Set(([] as FileGroupType[]).concat(...this._attachmentTypeGroups.value!.map(group => group.types))) ].find(type => type.groupTypeID === file.groupTypeID);
     return !type!.extensionReference.map(ref => ref.extension).includes(file.extension);
   }
+  isInvalidExtension(file: FilePatient, type: FileGroupType): boolean {
+    return !type.extensionReference.map(ref => ref.extension).includes(file.extension);
+  }
 
   private initialize(): void {
     this._attachmentTypeGroups = new BehaviorSubject<FileTypeGroup[] | null>(null);
@@ -239,8 +264,9 @@ export class FileAttachmentComponent implements OnInit, OnChanges {
     this._selectedFiles = new BehaviorSubject<FilePatient[]>([]);
     this._existingFiles = new BehaviorSubject<FilePatient[] | null>(null);
     this.dataSource = new FileDataSource([]);
+    this._filter = new BehaviorSubject<string>('');
 
-    if (this.showStatus) {
+    if (this.showStatus && !this.displayedColumns.includes('status')) {
       const index = this.displayedColumns.indexOf('size');
       this.displayedColumns.splice(index, 0, 'status');
     }
@@ -258,7 +284,7 @@ export class FileAttachmentComponent implements OnInit, OnChanges {
         return typeGroups;
       }),
       tap(groups => {
-        if (groups.length > 1) {
+        if (groups.length > 1 && !this.displayedColumns.includes('group')) {
           const index = this.displayedColumns.indexOf('type');
           this.displayedColumns.splice(index, 0, 'group');
         }
@@ -281,6 +307,8 @@ export class FileAttachmentComponent implements OnInit, OnChanges {
         this.dataSource.setData(files);
       }
     });
+
+    this.filterControl.valueChanges.subscribe(this._filter);
   }
 
   private loading(file: FilePatient, action: FileAction): void {

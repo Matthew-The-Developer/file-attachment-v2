@@ -1,0 +1,19 @@
+.mat-form-field-appearance-outline .mat-form-field-suffix {
+  top: 0.15em !important;
+}
+
+.mat-form-field-appearance-legacy.compactable .mat-form-field-wrapper,
+.mat-form-field-appearance-standard.compactable .mat-form-field-wrapper,
+.mat-form-field-appearance-fill.compactable .mat-form-field-wrapper,
+.mat-form-field-appearance-outline.compactable .mat-form-field-wrapper {
+  transition: padding 0.5s;
+  .mat-form-field-underline {
+    position: static;
+  }
+}
+.mat-form-field-appearance-legacy.compact .mat-form-field-wrapper,
+.mat-form-field-appearance-standard.compact .mat-form-field-wrapper,
+.mat-form-field-appearance-fill.compact .mat-form-field-wrapper,
+.mat-form-field-appearance-outline.compact .mat-form-field-wrapper {
+  padding: 0;
+}
