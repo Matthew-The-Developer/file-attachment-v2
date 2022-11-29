@@ -111,18 +111,16 @@
 
       <mat-menu #groupMenu="matMenu" (closed)="clear()" yPosition="below" class="group-type-menu">
         <ng-container *ngIf="!multipleAttachmentTypeGroups; else multipleGroups">
-          <ng-container *ngFor="let type of (attachmentTypes$ | async); let last = last">
-            <button 
-              (click)="typeChange(element, type)"
-              [disabled]="isInvalidExtension(element, type)"
-              class="type"
-              mat-menu-item
-            >
-              {{ type.typeName }}
-              <br><mark *ngFor="let ref of type.extensionReference">{{ ref.extension }}</mark>
-            </button>
-            <mat-divider *ngIf="!last"></mat-divider>
-          </ng-container>
+          <button
+            *ngFor="let type of (attachmentTypes$ | async)"
+            (click)="typeChange(element, type)"
+            [disabled]="isInvalidExtension(element, type)"
+            class="type"
+            mat-menu-item
+          >
+            {{ type.typeName }}
+            <br><mark *ngFor="let ref of type.extensionReference">{{ ref.extension }}</mark>
+          </button>
         </ng-container>
 
         <ng-template #multipleGroups>

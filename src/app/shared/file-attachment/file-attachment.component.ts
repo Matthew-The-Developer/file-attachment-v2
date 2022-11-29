@@ -35,13 +35,13 @@ export class FileAttachmentComponent implements OnInit, OnChanges {
   displayedColumns: string[] = ['name', 'size', 'date', 'type', 'actions'];
   
   _attachmentTypeGroups: BehaviorSubject<FileTypeGroup[] | null> = new BehaviorSubject<FileTypeGroup[] | null>(null);
+  _filteredTypeGroups: BehaviorSubject<FileTypeGroup[] | null> = new BehaviorSubject<FileTypeGroup[] | null>(null)
   _extensions: BehaviorSubject<FileExtension[] | null> = new BehaviorSubject<FileExtension[] | null>(null);
   
   _selectedFiles: BehaviorSubject<FilePatient[]> = new BehaviorSubject<FilePatient[]>([]);
   _existingFiles: BehaviorSubject<FilePatient[] | null> = new BehaviorSubject<FilePatient[] | null>(null);
   dataSource: FileDataSource = new FileDataSource([]);
 
-  _filter: BehaviorSubject<string> = new BehaviorSubject<string>('');
   filterControl: FormControl = new FormControl();
 
   fileState: Map<FilePatient, FileState> = new Map<FilePatient, FileState>();
@@ -61,20 +61,7 @@ export class FileAttachmentComponent implements OnInit, OnChanges {
 
   get existingFiles$(): Observable<FilePatient[] | null> { return this._existingFiles.asObservable() }
   get attachmentTypeGroups$(): Observable<FileTypeGroup[] | null> { return this._attachmentTypeGroups.asObservable() }
-  get filteredTypeGroups$(): Observable<FileTypeGroup[] | null> { 
-    return this._attachmentTypeGroups.asObservable().pipe(
-      withLatestFrom(this._filter, (groups, filter) => {
-        
-        if (groups && filter) {
-          const filteredGroups = [ ...groups.map(group => ({ ...group })) ];
-          filteredGroups.forEach(group => group.types = group.types.filter((type) => type.typeName.toLowerCase().includes(filter.toLowerCase()) || type.groupName.toLowerCase().includes(filter.toLowerCase())));
-          return filteredGroups.filter(group => group.types.length > 0);
-        } else {
-          return groups;
-        }
-      })
-    );
-  }
+  get filteredTypeGroups$(): Observable<FileTypeGroup[] | null> { return this._filteredTypeGroups.asObservable() }
   get attachmentTypes$(): Observable<FileGroupType[]> { return this._attachmentTypeGroups.pipe(val => val!!, map(groups => groups![0].types)) }
   get extensions$(): Observable<FileExtension[] | null> { return this._extensions.asObservable() }
   get acceptableExtensions$(): Observable<string> { 
@@ -218,6 +205,17 @@ export class FileAttachmentComponent implements OnInit, OnChanges {
     }
   }
 
+  filter(search: string): void {
+    const groups = this._attachmentTypeGroups.value;
+    if (groups && search) {
+      const filteredGroups = [ ...groups.map(group => ({ ...group })) ];
+      filteredGroups.forEach(group => group.types = group.types.filter((type) => type.typeName.toLowerCase().includes(search.toLowerCase()) || type.groupName.toLowerCase().includes(search.toLowerCase())));
+      this._filteredTypeGroups.next(filteredGroups.filter(group => group.types.length > 0));
+    } else {
+      this._filteredTypeGroups.next(groups);
+    }
+  }
+
   clear() {
     this.filterControl.reset();
   }
@@ -266,12 +264,13 @@ export class FileAttachmentComponent implements OnInit, OnChanges {
   }
 
   private initialize(): void {
-    this._filter = new BehaviorSubject<string>('');
     this._attachmentTypeGroups = new BehaviorSubject<FileTypeGroup[] | null>(null);
+    this._filteredTypeGroups = new BehaviorSubject<FileTypeGroup[] | null>(null);
     this._extensions = new BehaviorSubject<FileExtension[] | null>(null);
     this._selectedFiles = new BehaviorSubject<FilePatient[]>([]);
     this._existingFiles = new BehaviorSubject<FilePatient[] | null>(null);
     this.dataSource = new FileDataSource([]);
+    this.filterControl.reset();
 
     if (this.showStatus && !this.displayedColumns.includes('status')) {
       const index = this.displayedColumns.indexOf('size');
@@ -292,6 +291,8 @@ export class FileAttachmentComponent implements OnInit, OnChanges {
       }),
       tap(groups => {
         if (groups.length > 1 && !this.displayedColumns.includes('group')) {
+          this._filteredTypeGroups.next(groups);
+
           const index = this.displayedColumns.indexOf('type');
           this.displayedColumns.splice(index, 0, 'group');
         }
@@ -315,8 +316,7 @@ export class FileAttachmentComponent implements OnInit, OnChanges {
       }
     });
 
-    this.filterControl.reset();
-    this.filterControl.valueChanges.subscribe(this._filter);
+    this.filterControl.valueChanges.subscribe((search: string) => this.filter(search));
   }
 
   private loading(file: FilePatient, action: FileAction): void {
