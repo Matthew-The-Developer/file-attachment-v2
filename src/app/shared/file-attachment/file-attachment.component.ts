@@ -211,6 +211,7 @@ export class FileAttachmentComponent implements OnInit, OnChanges {
       const filteredGroups = [ ...groups.map(group => ({ ...group })) ];
       filteredGroups.forEach(group => group.types = group.types.filter((type) => type.typeName.toLowerCase().includes(search.toLowerCase()) || type.groupName.toLowerCase().includes(search.toLowerCase())));
       this._filteredTypeGroups.next(filteredGroups.filter(group => group.types.length > 0));
+      
     } else {
       this._filteredTypeGroups.next(groups);
     }

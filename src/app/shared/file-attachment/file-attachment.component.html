@@ -127,7 +127,7 @@
           <div (click)="$event.stopPropagation()" class="filter">
             <mat-form-field appearance="fill" compact>
               <mat-label>Type Search</mat-label>
-              <input [formControl]="filterControl" autocomplete="off" matInput>
+              <input #groupSearch (change)="groupSearch.focus()" [formControl]="filterControl" autocomplete="off" matInput>
             </mat-form-field>
           </div>
           
