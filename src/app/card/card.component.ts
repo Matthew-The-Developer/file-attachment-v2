@@ -10,7 +10,6 @@ import { FileAttachmentComponent } from '../shared/file-attachment/file-attachme
 })
 export class CardComponent implements OnInit {
   options: FileRequestOptions = { attachmentWorkItemID: 29 };
-  groupIDs = [ 10, 12 ];
   byteSizeLimit = 2 * 1024 * 1024;
 
   @ViewChild(FileAttachmentComponent) child!: FileAttachmentComponent;

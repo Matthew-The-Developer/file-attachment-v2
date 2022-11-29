@@ -10,7 +10,7 @@
   <mat-card-content>
     <app-file-attachment
       [options]="options"
-      [groupIDs]="groupIDs"
+      [workItemID]="fileService.workItemID"
       [mode]="fileService.fileMode"
       [byteSizeLimit]="byteSizeLimit"
     ></app-file-attachment>

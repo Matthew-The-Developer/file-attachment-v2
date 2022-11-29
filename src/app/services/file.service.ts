@@ -11,11 +11,18 @@ import { FileRequestOptions } from '../models/file-request-options.model';
 })
 export class FileService {
   fileMode: FileMode = FileMode.uploadonly;
+  workItemID: number = 24;
   getFilesSuccessful: boolean = true;
   createFileSuccessful: boolean = true;
   deleteFileSuccessful: boolean = true;
   updateTypeSuccessful: boolean = true;
   updateDateSuccessful: boolean = true;
+
+  private workItemMap: Map<number, number[]> = new Map<number, number[]>([
+    [24, [10]],
+    [23, [10, 11, 12]],
+    [22, []],
+  ])
 
   private _files: BehaviorSubject<FilePatient[]> = new BehaviorSubject<FilePatient[]>([
     {
@@ -226,7 +233,8 @@ export class FileService {
     }
   }
 
-  getFileGroups(groupIDs: number[] = []): Observable<FileGroupType[]> {
+  getFileGroups(workItemId: number): Observable<FileGroupType[]> {
+    const groupIDs = this.workItemMap.get(workItemId)!;
     if (groupIDs.length > 0) {
       return this._groups.asObservable().pipe(
         map(groups => groups.filter(group => groupIDs.includes(group.groupID))),

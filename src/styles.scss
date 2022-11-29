@@ -106,10 +106,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 ::-webkit-scrollbar {
   width: 4px;
-}
-
-::-webkit-scrollbar-track {
-
+  height: 4px;
 }
 
 ::-webkit-scrollbar-thumb {

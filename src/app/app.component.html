@@ -2,17 +2,32 @@
   <span>File Attachment v2.0</span>
 
   <span spacer></span>
-
+  
   <button
     mat-button
-    [matMenuTriggerFor]="menu"
+    [matMenuTriggerFor]="groupMenu"
+    class="suffix-icon"
+  >
+    {{ workItemName(fileService.workItemID) }}
+    <mat-icon>arrow_drop_down</mat-icon>
+  </button>
+
+  <mat-menu #groupMenu="matMenu">
+    <button mat-menu-item (click)="fileService.workItemID= 24">One Group</button>
+    <button mat-menu-item (click)="fileService.workItemID = 23">Multiple Groups</button>
+    <button mat-menu-item (click)="fileService.workItemID = 22">All Groups</button>
+  </mat-menu>
+  
+  <button
+    mat-button
+    [matMenuTriggerFor]="modeMenu"
     class="suffix-icon"
   >
     {{ fileModeName(fileService.fileMode) }}
     <mat-icon>arrow_drop_down</mat-icon>
   </button>
 
-  <mat-menu #menu="matMenu">
+  <mat-menu #modeMenu="matMenu">
     <button mat-menu-item (click)="fileService.fileMode = 0">Upload Only</button>
     <button mat-menu-item (click)="fileService.fileMode = 1">Read Only</button>
     <button mat-menu-item (click)="fileService.fileMode = 2">Read & Upload</button>

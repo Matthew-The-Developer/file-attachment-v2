@@ -15,6 +15,7 @@ import { FileState } from 'src/app/models/file-state.model';
 import { FileService } from 'src/app/services/file.service';
 import { DeleteComfirmationDialogComponent } from '../delete-comfirmation-dialog/delete-comfirmation-dialog.component';
 import { ImagePreviewDialogComponent } from '../image-preview-dialog/image-preview-dialog.component';
+import { PdfPreviewDialogComponent } from '../pdf-preview-dialog/pdf-preview-dialog.component';
 
 @Component({
   selector: 'app-file-attachment',
@@ -23,7 +24,7 @@ import { ImagePreviewDialogComponent } from '../image-preview-dialog/image-previ
 })
 export class FileAttachmentComponent implements OnInit, OnChanges {
   @Input() options!: FileRequestOptions;
-  @Input() groupIDs!: number[];
+  @Input() workItemID!: number;
   @Input() mode: FileMode = FileMode.uploadonly;
   @Input() byteSizeLimit?: number = undefined;
   @Input() singleFile: boolean = false;
@@ -89,7 +90,7 @@ export class FileAttachmentComponent implements OnInit, OnChanges {
     const files = this._selectedFiles.value;
 
     files.forEach(file => {
-      if (!this.hasInvalidSize(file)) {
+      if (!this.hasInvalidSize(file) && !this.hasInvalidExtension(file)) {
         this.attach(file);
       }
     });
@@ -208,7 +209,12 @@ export class FileAttachmentComponent implements OnInit, OnChanges {
         maxHeight: '90vh',
       });
     } else if (this.isPDF(file)) {
-
+      this.dialog.open(PdfPreviewDialogComponent, {
+        data: file,
+        hasBackdrop: true,
+        panelClass: 'pdf-preview-dialog',
+        maxHeight: '90vh',
+      });
     }
   }
 
@@ -228,7 +234,8 @@ export class FileAttachmentComponent implements OnInit, OnChanges {
   }
   isPDF(file: FilePatient): boolean {
     const extension = this._extensions.value!.find(extension => extension.extensionID === file.extensionID);
-    return extension!.description.includes('pdf');
+    console.log(extension);
+    return file.extension === 'pdf';
   }
 
   isLoading(file: FilePatient, action: FileAction): boolean { return this.fileState.has(file) && this.fileState.get(file)!.loading !== undefined && this.fileState.get(file)!.loading!.includes(action) }
@@ -252,26 +259,26 @@ export class FileAttachmentComponent implements OnInit, OnChanges {
   }
   hasInvalidExtension(file: FilePatient): boolean {
     const type = [ ... new Set(([] as FileGroupType[]).concat(...this._attachmentTypeGroups.value!.map(group => group.types))) ].find(type => type.groupTypeID === file.groupTypeID);
-    return !type!.extensionReference.map(ref => ref.extension).includes(file.extension);
+    return type !== undefined && !type.extensionReference.map(ref => ref.extension).includes(file.extension);
   }
   isInvalidExtension(file: FilePatient, type: FileGroupType): boolean {
     return !type.extensionReference.map(ref => ref.extension).includes(file.extension);
   }
 
   private initialize(): void {
+    this._filter = new BehaviorSubject<string>('');
     this._attachmentTypeGroups = new BehaviorSubject<FileTypeGroup[] | null>(null);
     this._extensions = new BehaviorSubject<FileExtension[] | null>(null);
     this._selectedFiles = new BehaviorSubject<FilePatient[]>([]);
     this._existingFiles = new BehaviorSubject<FilePatient[] | null>(null);
     this.dataSource = new FileDataSource([]);
-    this._filter = new BehaviorSubject<string>('');
 
     if (this.showStatus && !this.displayedColumns.includes('status')) {
       const index = this.displayedColumns.indexOf('size');
       this.displayedColumns.splice(index, 0, 'status');
     }
 
-    this.fileService.getFileGroups(this.groupIDs).pipe(
+    this.fileService.getFileGroups(this.workItemID).pipe(
       filter(groupTypes => !!groupTypes),
       tap(groupTypes => {
         const extensions = [ ... new Set(([] as FileExtension[]).concat(...groupTypes.map(groupType => groupType.extensionReference))) ];
@@ -308,6 +315,7 @@ export class FileAttachmentComponent implements OnInit, OnChanges {
       }
     });
 
+    this.filterControl.reset();
     this.filterControl.valueChanges.subscribe(this._filter);
   }
 

@@ -20,4 +20,13 @@ export class AppComponent {
       default: return '';
     }
   }
+
+  workItemName(id: number): string {
+    switch(id) {
+      case 24: return 'One Group';
+      case 23: return 'Multiple Groups';
+      case 22: return 'All Groups';
+      default: return '';
+    }
+  }
 }
