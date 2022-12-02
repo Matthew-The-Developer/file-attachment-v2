@@ -10,7 +10,12 @@
       </ng-container>
 
       <ng-template #notPreviewable>
-        <span [title]="name(element)">
+        <span 
+          [title]="name(element)"
+          matTooltip="Preview not supported. Please preview locally"
+          matTooltipPosition="after"
+          matTooltipShowDelay="1000"
+        >
           <span class="name">{{ element.name }}</span>.{{ element.extension }}
         </span>
       </ng-template>
@@ -56,7 +61,7 @@
         [color]="hasFailed(element, 2) ? 'warn' : ''"
         class="suffix-icon"
       >
-        {{ element.documentDate | date:'shortDate' }}
+        {{ element.documentDate | date:'MM/dd/yyyy' }}
 
         <ng-container *ngIf="isLoading(element, 2); else notChangingDate">
           <mat-spinner diameter="16"></mat-spinner>
@@ -111,16 +116,21 @@
 
       <mat-menu #groupMenu="matMenu" (closed)="clear()" yPosition="below" class="group-type-menu">
         <ng-container *ngIf="!multipleAttachmentTypeGroups; else multipleGroups">
-          <button
+          <div
             *ngFor="let type of (attachmentTypes$ | async)"
-            (click)="typeChange(element, type)"
-            [disabled]="isInvalidExtension(element, type)"
-            class="type"
-            mat-menu-item
+            [matTooltipDisabled]="!isInvalidExtension(element, type)"
+            [matTooltip]="isInvalidExtensionReason(type)"
           >
-            {{ type.typeName }}
-            <br><mark *ngFor="let ref of type.extensionReference">{{ ref.extension }}</mark>
-          </button>
+            <button
+              (click)="typeChange(element, type)"
+              [disabled]="isInvalidExtension(element, type)"
+              class="type"
+              mat-menu-item
+            >
+              {{ type.typeName }}
+              <span *ngIf="isInvalidExtension(element, type)">(Not Supported)</span>
+            </button>
+          </div>
         </ng-container>
 
         <ng-template #multipleGroups>
@@ -133,16 +143,21 @@
           
           <ng-container *ngFor="let group of filteredTypeGroups$ | async">
             <span class="group">{{ group.groupName }}</span>
-            <button 
-              *ngFor="let type of group.types"
-              (click)="typeChange(element, type)"
-              [disabled]="isInvalidExtension(element, type)"
-              class="type"
-              mat-menu-item
+            <div
+              *ngFor="let type of (attachmentTypes$ | async)"
+              [matTooltipDisabled]="!isInvalidExtension(element, type)"
+              [matTooltip]="isInvalidExtensionReason(type)"
             >
-              {{ type.typeName }}
-              <br><mark *ngFor="let ref of type.extensionReference">{{ ref.extension }}</mark>
-            </button>
+              <button
+                (click)="typeChange(element, type)"
+                [disabled]="isInvalidExtension(element, type)"
+                class="type"
+                mat-menu-item
+              >
+                {{ type.typeName }}
+                <span *ngIf="isInvalidExtension(element, type)">(Not Supported)</span>
+              </button>
+            </div>
           </ng-container>
         </ng-template>
       </mat-menu>

@@ -1,5 +1,5 @@
 import { DataSource } from '@angular/cdk/collections';
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { setupTestingRouter } from '@angular/router/testing';
@@ -31,6 +31,8 @@ export class FileAttachmentComponent implements OnInit, OnChanges {
   @Input() defaultToDateUploaded: boolean = false;
   @Input() defaultAttachmentTypeID?: number = undefined;
   @Input() documentDateLabel: string = 'Document Date';
+
+  @ViewChild("groupSearch") groupSearch!: ElementRef;
   
   displayedColumns: string[] = ['name', 'size', 'date', 'type', 'actions'];
   
@@ -178,7 +180,7 @@ export class FileAttachmentComponent implements OnInit, OnChanges {
         this.success(file, FileAction.ChangeType);
       }, (error) => {
         console.log(error);
-        this.failure(file, FileAction.ChangeDate);
+        this.failure(file, FileAction.ChangeType);
       });
     } else {
       file.groupTypeID = type.groupTypeID;
@@ -211,7 +213,6 @@ export class FileAttachmentComponent implements OnInit, OnChanges {
       const filteredGroups = [ ...groups.map(group => ({ ...group })) ];
       filteredGroups.forEach(group => group.types = group.types.filter((type) => type.typeName.toLowerCase().includes(search.toLowerCase()) || type.groupName.toLowerCase().includes(search.toLowerCase())));
       this._filteredTypeGroups.next(filteredGroups.filter(group => group.types.length > 0));
-      
     } else {
       this._filteredTypeGroups.next(groups);
     }
@@ -262,6 +263,9 @@ export class FileAttachmentComponent implements OnInit, OnChanges {
   }
   isInvalidExtension(file: FilePatient, type: FileGroupType): boolean {
     return !type.extensionReference.map(ref => ref.extension).includes(file.extension);
+  }
+  isInvalidExtensionReason(type: FileGroupType): string {
+    return `${type.typeName} only supports ${type.extensionReference.map(ref => `.${ref.extension}`).join(', ')} files`;
   }
 
   private initialize(): void {

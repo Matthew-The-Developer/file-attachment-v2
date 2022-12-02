@@ -49,30 +49,5 @@
       font-size: 12px;
       color: #0c2678;
     }
-  
-    button.mat-menu-item[disabled].type {
-      mark {
-        background: rgba($color: #000000, $alpha: 0.08);
-        color: rgba($color: #000000, $alpha: 0.38);
-      }
-    }
-    button.mat-menu-item.type {
-      line-height: unset;
-
-      mark {
-        font-size: 12px;
-        padding: 2px 3px;
-        border-radius: 4px;
-        background: rgba($color: #000000, $alpha: 0.14);
-        color: rgba($color: #000000, $alpha: 0.54);
-        text-overflow: none;
-      }
-      mark:first-child {
-        margin-right: 2px;
-      }
-      mark + mark {
-        margin: 0 2px;
-      }
-    }
   }
 }
