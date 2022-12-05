@@ -228,7 +228,7 @@
       </ng-container>
 
       <ng-template #notAttached>
-        <button (click)="deselect(element)" color="warn" class="square" mat-button>
+        <button (click)="deselect(element)" [disabled]="isLoading(element, 0)" color="warn" class="square" mat-button>
           <mat-icon>close</mat-icon>
         </button>
        
