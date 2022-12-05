@@ -57,7 +57,7 @@
         mat-button
         #dateMenuTrigger="matMenuTrigger"
         [matMenuTriggerFor]="dateMenu"
-        [disabled]="hasInvalidSize(element) || isLoading(element, 2)"
+        [disabled]="hasInvalidSize(element) || isLoading(element, 0) || isLoading(element, 2)"
         [color]="hasFailed(element, 2) ? 'warn' : ''"
         class="suffix-icon"
       >
@@ -100,7 +100,7 @@
       <button 
         mat-button
         [matMenuTriggerFor]="groupMenu"
-        [disabled]="hasInvalidSize(element) || isLoading(element, 3)"
+        [disabled]="hasInvalidSize(element) || isLoading(element, 0) || isLoading(element, 3)"
         [color]="hasFailed(element, 3) || hasInvalidExtension(element) ? 'warn' : ''"
         class="suffix-icon"
       >
