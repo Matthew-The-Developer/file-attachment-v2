@@ -194,7 +194,7 @@
         hidden
       >
     </th>
-    <td mat-cell *matCellDef="let element" class="size">
+    <td mat-cell *matCellDef="let element">
       <ng-container *ngIf="isAttached(element); else notAttached">
         <button
           [matMenuTriggerFor]="actionMenu"
