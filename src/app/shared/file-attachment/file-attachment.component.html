@@ -251,25 +251,49 @@
 
   <tr class="mat-row" *matNoDataRow>
     <td class="mat-cell no-data" [attr.colspan]="displayedColumns.length">
-      <ng-container *ngIf="this.mode !== 0; else uploadOnly">
-        <ng-container *ngIf="!(existingFiles$ | async); else loaded">
-          <mat-spinner diameter="24"></mat-spinner>
+      <div>
+        <ng-container *ngIf="this.mode !== 0; else uploadOnly">
+          <ng-container *ngIf="!(existingFiles$ | async); else loaded">
+            <mat-spinner diameter="24"></mat-spinner>
+          </ng-container>
+  
+          <ng-template #loaded>
+            No Files Attached
+          </ng-template>
         </ng-container>
-
-        <ng-template #loaded>
-          No Files Attached
+  
+        <ng-template #uploadOnly>
+          <ng-container *ngIf="!(attachmentTypeGroups$ | async) || !(extensions$ | async); else loaded">
+            <mat-spinner  diameter="24"></mat-spinner>
+          </ng-container>
+  
+          <ng-template #loaded>
+            <button 
+              mat-button
+              (click)="fileInput.click()"
+              [disabled]="!(attachmentTypeGroups$ | async) || !(extensions$ | async)" 
+            >
+              <ng-container *ngIf="(attachmentTypeGroups$ | async) && (extensions$ | async); else loading">
+                Select Files to Attach
+              </ng-container>
+              
+              <ng-template #loading>
+                <mat-spinner diameter="18" color="accent"></mat-spinner>
+              </ng-template>
+            </button>
+  
+            <input
+              #fileInput
+              (change)="select($event)"
+              [multiple]="!singleFile"
+              [accept]="acceptableExtensions$ | async"
+              type="file"
+              class="file-upload"
+              hidden
+            >
+          </ng-template>
         </ng-template>
-      </ng-container>
-
-      <ng-template #uploadOnly>
-        <ng-container *ngIf="!(attachmentTypeGroups$ | async) || !(extensions$ | async); else loaded">
-          <mat-spinner  diameter="24"></mat-spinner>
-        </ng-container>
-
-        <ng-template #loaded>
-          Select Files to Attach
-        </ng-template>
-      </ng-template>
+      </div>
     </td>
   </tr>
 
