@@ -29,6 +29,8 @@ export class FileAttachmentComponent implements OnInit, OnChanges {
   @Input() byteSizeLimit?: number = undefined;
   @Input() singleFile: boolean = false;
   @Input() defaultToDateUploaded: boolean = false;
+  @Input() minDocumentDate?: Date = undefined;
+  @Input() maxDocumentDate?: Date = undefined;
   @Input() defaultAttachmentTypeID?: number = undefined;
   @Input() documentDateLabel: string = 'Document Date';
 

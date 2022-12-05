@@ -82,6 +82,8 @@
             <mat-calendar 
               (selectedChange)="dateChange(element, $event); dateMenuTrigger.closeMenu()"
               [selected]="element.documentDate"
+              [minDate]="minDocumentDate"
+              [maxDate]="maxDocumentDate"
             ></mat-calendar>
           </div>
         </ng-template>
