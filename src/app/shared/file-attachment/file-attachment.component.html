@@ -271,15 +271,8 @@
             <button 
               mat-button
               (click)="fileInput.click()"
-              [disabled]="!(attachmentTypeGroups$ | async) || !(extensions$ | async)" 
             >
-              <ng-container *ngIf="(attachmentTypeGroups$ | async) && (extensions$ | async); else loading">
-                Select Files to Attach
-              </ng-container>
-              
-              <ng-template #loading>
-                <mat-spinner diameter="18" color="accent"></mat-spinner>
-              </ng-template>
+              Select Files to Attach
             </button>
   
             <input
