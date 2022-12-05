@@ -74,6 +74,7 @@ export class FileAttachmentComponent implements OnInit, OnChanges {
       map(types => types!.map(type => `.${type.extension}`).join(','))
     );
   }
+  get selectedFileCount$(): Observable<number> { return this._selectedFiles.asObservable().pipe(map(files => files.length)) }
   get showStatus(): boolean { return this.mode === FileMode.readAndUpload }
   get multipleAttachmentTypeGroups(): boolean { return this._attachmentTypeGroups.value!.length > 1 }
 
