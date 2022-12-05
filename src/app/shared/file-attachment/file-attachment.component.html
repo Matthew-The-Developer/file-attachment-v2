@@ -120,6 +120,7 @@
             *ngFor="let type of (attachmentTypes$ | async)"
             [matTooltipDisabled]="!isInvalidExtension(element, type)"
             [matTooltip]="isInvalidExtensionReason(type)"
+            matTooltipShowDelay="1000"
           >
             <button
               (click)="typeChange(element, type)"
@@ -147,6 +148,7 @@
               *ngFor="let type of group.types"
               [matTooltipDisabled]="!isInvalidExtension(element, type)"
               [matTooltip]="isInvalidExtensionReason(type)"
+              matTooltipShowDelay="1000"
             >
               <button
                 (click)="typeChange(element, type)"
