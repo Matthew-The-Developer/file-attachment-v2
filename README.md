@@ -14,7 +14,7 @@ Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The appli
 
 Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
 
-Run `ng build --base-href "https://Matthew-The-Developer.github.io/file-attachment-v2/"` to build the project for [GitHub Pages](https://matthew-the-developer.github.io/file-attachment/). The build artifacts will be stored in the `dist/` directory.
+Run `ng build --base-href "https://Matthew-The-Developer.github.io/file-attachment-v2/"` to build the project for [GitHub Pages](https://matthew-the-developer.github.io/file-attachment-v2/). The build artifacts will be stored in the `dist/` directory.
 
 ## Deploy
 
