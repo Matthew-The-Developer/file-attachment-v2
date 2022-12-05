@@ -144,7 +144,7 @@
           <ng-container *ngFor="let group of filteredTypeGroups$ | async">
             <span class="group">{{ group.groupName }}</span>
             <div
-              *ngFor="let type of (attachmentTypes$ | async)"
+              *ngFor="let type of group.types"
               [matTooltipDisabled]="!isInvalidExtension(element, type)"
               [matTooltip]="isInvalidExtensionReason(type)"
             >
