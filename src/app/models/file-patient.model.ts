@@ -5,7 +5,7 @@ export interface FilePatient {
   name: string;
   extensionID: number;
   extension: string;
-  documentDate: Date;
+  documentDate?: Date;
   byteSize: number;
   groupTypeID: number;
   typeName: string;

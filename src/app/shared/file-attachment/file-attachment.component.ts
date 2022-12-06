@@ -112,7 +112,6 @@ export class FileAttachmentComponent implements OnInit, OnChanges {
           byteSize: file.size,
           extensionID: extensionRef!.extensionID,
           extension: extensionRef!.extension,
-          documentDate: this.defaultToDateUploaded ? new Date() : new Date(file.lastModified),
           groupTypeID: fileType!.groupTypeID,
           typeName: fileType!.typeName,
           groupName: fileType!.groupName,
@@ -226,6 +225,8 @@ export class FileAttachmentComponent implements OnInit, OnChanges {
   }
 
   name(file: FilePatient): string { return `${file.name}.${file.extension}` }
+  documentDate(file: FilePatient): string { return file.documentDate ? ((file.documentDate.getMonth() > 8) ? (file.documentDate.getMonth() + 1) : ('0' + (file.documentDate.getMonth() + 1))) + '/' + ((file.documentDate.getDate() > 9) ? file.documentDate.getDate() : ('0' + file.documentDate.getDate())) + '/' + file.documentDate.getFullYear() : 'Date Required' }
+  hasDocumentDate(file: FilePatient): boolean { return file.documentDate !== undefined  }
   isAttached(file: FilePatient): boolean { return file.attachedToRecordID !== undefined }
   isPreviewable(file: FilePatient): boolean { 
     const extension = this._extensions.value!.find(extension => extension.extensionID === file.extensionID);

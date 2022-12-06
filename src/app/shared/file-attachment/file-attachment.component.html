@@ -58,10 +58,10 @@
         #dateMenuTrigger="matMenuTrigger"
         [matMenuTriggerFor]="dateMenu"
         [disabled]="hasInvalidSize(element) || isLoading(element, 0) || isLoading(element, 2)"
-        [color]="hasFailed(element, 2) ? 'warn' : ''"
+        [color]="hasFailed(element, 2) || !hasDocumentDate(element) ? 'warn' : ''"
         class="suffix-icon"
       >
-        {{ element.documentDate | date:'MM/dd/yyyy' }}
+        {{ documentDate(element) }}
 
         <ng-container *ngIf="isLoading(element, 2); else notChangingDate">
           <mat-spinner diameter="16"></mat-spinner>
@@ -239,7 +239,7 @@
        
         <button
           (click)="attach(element)"
-          [disabled]="hasInvalidSize(element) || hasInvalidExtension(element) || isLoading(element, 0)"
+          [disabled]="hasInvalidSize(element) || hasInvalidExtension(element) || !hasDocumentDate(element) || isLoading(element, 0)"
           [color]="hasFailed(element, 0) ? 'warn' : 'accent'"
           class="square"
           mat-button
