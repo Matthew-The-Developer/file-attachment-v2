@@ -82,7 +82,7 @@ export class FileAttachmentComponent implements OnInit, OnChanges {
     const files = this._selectedFiles.value;
 
     files.forEach(file => {
-      if (!this.hasInvalidSize(file) && !this.hasInvalidExtension(file)) {
+      if (!this.hasInvalidSize(file) && !this.hasInvalidExtension(file) && this.hasDocumentDate(file)) {
         this.attach(file);
       }
     });
