@@ -1,152 +1,154 @@
 :host {
   width: 100%;
 
-  .scrollable {
-    max-height: 336px;
+  div {
     overflow-y: overlay;
+    
+    table {
+      width: 100%;
+      border-bottom-color: rgba(0, 0, 0, 0.12);
+      border-bottom-width: 1px;
+      border-bottom-style: solid;
+  
+      tr.mat-header-row {
+        height: 36px;
+  
+        th.mat-header-cell:first-of-type {
+          padding-left: 0.75rem;
+        }
+  
+        th.mat-header-cell:last-of-type {
+          padding-right: 0.75rem;
+        }
+  
+        th.mat-header-cell.cdk-column-name {
+          min-width: 120px;
+        }
+  
+        th.mat-header-cell.cdk-column-status {
+          width: 44px;
+          padding: 0 0.5rem;
+          text-align: center;
+        }
+  
+        th.mat-header-cell.cdk-column-date,
+        th.mat-header-cell.cdk-column-type {
+          padding-left: 1rem;
+        }
+  
+        th.mat-header-cell.cdk-column-actions {
+          text-align: end;
+  
+          button {
+            font-size: 13px;
+  
+            mat-spinner {
+              margin: 0 0.25rem;
+              padding: 0.125rem 0;
+              display: inline-block;
+            }
+          }
+        }
+      }
+  
+      tr.mat-row {
+        td.mat-cell {
+          border-bottom-width: unset;
+          border-bottom-style: unset;
+        }
+  
+        td.mat-cell.cdk-column-name {
+          min-width: 120px;
+          max-width: 320px;
+  
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+  
+          mat-error {
+            font-size: 12px;
+            font-weight: 500;
+          }
+        }
+  
+        td.mat-cell:first-of-type {
+          padding-left: 0.75rem;
+        }
+  
+        td.mat-cell:last-of-type {
+          padding-right: 0.75rem;
+        }
+  
+        td.mat-cell.cdk-column-status {
+          width: 44px;
+          padding: 0 0.5rem;
+          text-align: center;
+          
+          mat-icon {
+            height: 18px;
+            font-size: 18px;
+          }
+        }
+  
+        td.mat-cell.cdk-column-date {
+          button {
+            mat-icon {
+              height: 22px;
+              font-size: 20px;
+              margin-left: 0.25rem;
+            }
+          }
+        }
+  
+        td.mat-cell.cdk-column-type {
+          button {
+            mat-icon {
+              height: 22px;
+              font-size: 20px;
+            }
+          }
+        }
+  
+        td.mat-cell.cdk-column-actions {
+          height: 48px;
+          display: flex;
+          justify-content: flex-end;
+          align-items: center;
+        }
+  
+        td.mat-cell .previewable {
+          text-decoration: underline;
+          cursor: pointer;
+        }
+  
+        td.mat-cell .name {
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }
+  
+        td.mat-cell.info {
+          color: rgba(0, 0, 0, 0.54);
+        }
+  
+        td.mat-cell.warn {
+          color: #f44336;
+        }
+      }
+  
+      .no-data {
+        padding: 0;
+  
+        div {
+          width: 100%;
+          display: flex;
+          flex-flow: column nowrap;
+          align-items: center;
+          padding: 0.75rem 0;
+        }
+      }
+    }
   }
 
-  table {
-    width: 100%;
-    border-bottom-color: rgba(0, 0, 0, 0.12);
-    border-bottom-width: 1px;
-    border-bottom-style: solid;
 
-    tr.mat-header-row {
-      height: 36px;
 
-      th.mat-header-cell:first-of-type {
-        padding-left: 0.75rem;
-      }
-
-      th.mat-header-cell:last-of-type {
-        padding-right: 0.75rem;
-      }
-
-      th.mat-header-cell.cdk-column-name {
-        min-width: 120px;
-      }
-
-      th.mat-header-cell.cdk-column-status {
-        width: 44px;
-        padding: 0 0.5rem;
-        text-align: center;
-      }
-
-      th.mat-header-cell.cdk-column-date,
-      th.mat-header-cell.cdk-column-type {
-        padding-left: 1rem;
-      }
-
-      th.mat-header-cell.cdk-column-actions {
-        text-align: end;
-
-        button {
-          font-size: 13px;
-
-          mat-spinner {
-            margin: 0 0.25rem;
-            padding: 0.125rem 0;
-            display: inline-block;
-          }
-        }
-      }
-    }
-
-    tr.mat-row {
-      td.mat-cell {
-        border-bottom-width: unset;
-        border-bottom-style: unset;
-      }
-
-      td.mat-cell.cdk-column-name {
-        min-width: 120px;
-        max-width: 320px;
-
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-
-        mat-error {
-          font-size: 12px;
-          font-weight: 500;
-        }
-      }
-
-      td.mat-cell:first-of-type {
-        padding-left: 0.75rem;
-      }
-
-      td.mat-cell:last-of-type {
-        padding-right: 0.75rem;
-      }
-
-      td.mat-cell.cdk-column-status {
-        width: 44px;
-        padding: 0 0.5rem;
-        text-align: center;
-        
-        mat-icon {
-          height: 18px;
-          font-size: 18px;
-        }
-      }
-
-      td.mat-cell.cdk-column-date {
-        button {
-          mat-icon {
-            height: 22px;
-            font-size: 20px;
-            margin-left: 0.25rem;
-          }
-        }
-      }
-
-      td.mat-cell.cdk-column-type {
-        button {
-          mat-icon {
-            height: 22px;
-            font-size: 20px;
-          }
-        }
-      }
-
-      td.mat-cell.cdk-column-actions {
-        height: 48px;
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-      }
-
-      td.mat-cell .previewable {
-        text-decoration: underline;
-        cursor: pointer;
-      }
-
-      td.mat-cell .name {
-        white-space: nowrap;
-        text-overflow: ellipsis;
-      }
-
-      td.mat-cell.info {
-        color: rgba(0, 0, 0, 0.54);
-      }
-
-      td.mat-cell.warn {
-        color: #f44336;
-      }
-    }
-
-    .no-data {
-      padding: 0;
-
-      div {
-        width: 100%;
-        display: flex;
-        flex-flow: column nowrap;
-        align-items: center;
-        padding: 0.75rem 0;
-      }
-    }
-  }
 }

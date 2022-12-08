@@ -32,7 +32,7 @@ export class FileAttachmentComponent implements OnInit, OnChanges {
   @Input() maxDocumentDate?: Date = undefined;
   @Input() defaultAttachmentTypeID?: number = undefined;
   @Input() documentDateLabel: string = 'Document Date';
-  @Input() scrollable: boolean = true;
+  @Input() maxHeight?: number;
   
   displayedColumns: string[] = ['name', 'size', 'date', 'type', 'actions'];
   

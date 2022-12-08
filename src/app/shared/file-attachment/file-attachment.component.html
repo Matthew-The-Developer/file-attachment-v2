@@ -1,4 +1,4 @@
-<div [class.scrollable]="scrollable">
+<div [style.max-height.px]="maxHeight">
   <table mat-table [dataSource]="dataSource">
     <ng-container matColumnDef="name">
       <th mat-header-cell *matHeaderCellDef>Name</th>
@@ -297,7 +297,7 @@
       </td>
     </tr>
   
-    <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: scrollable"></tr>
+    <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: maxHeight"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
   </table>
 </div>
