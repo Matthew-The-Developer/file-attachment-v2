@@ -24,7 +24,6 @@ import { PdfPreviewDialogComponent } from '../pdf-preview-dialog/pdf-preview-dia
 })
 export class FileAttachmentComponent implements OnInit, OnChanges {
   @Input() options!: FileRequestOptions;
-  @Input() workItemID!: number;
   @Input() mode: FileMode = FileMode.uploadonly;
   @Input() byteSizeLimit?: number = undefined;
   @Input() singleFile: boolean = false;
@@ -33,8 +32,6 @@ export class FileAttachmentComponent implements OnInit, OnChanges {
   @Input() maxDocumentDate?: Date = undefined;
   @Input() defaultAttachmentTypeID?: number = undefined;
   @Input() documentDateLabel: string = 'Document Date';
-
-  @ViewChild("groupSearch") groupSearch!: ElementRef;
   
   displayedColumns: string[] = ['name', 'size', 'date', 'type', 'actions'];
   
@@ -286,7 +283,7 @@ export class FileAttachmentComponent implements OnInit, OnChanges {
       this.displayedColumns.splice(index, 0, 'status');
     }
 
-    this.fileService.getFileGroups(this.workItemID).pipe(
+    this.fileService.getFileGroups(this.options.attachmentWorkItemID).pipe(
       filter(groupTypes => !!groupTypes),
       tap(groupTypes => {
         const extensions = [ ... new Set(([] as FileExtension[]).concat(...groupTypes.map(groupType => groupType.extensionReference))) ];

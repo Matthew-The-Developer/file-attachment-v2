@@ -9,8 +9,7 @@
 
   <mat-card-content>
     <app-file-attachment
-      [options]="options"
-      [workItemID]="fileService.workItemID"
+      [options]="{ attachmentWorkItemID: fileService.workItemID }"
       [mode]="fileService.fileMode"
       [byteSizeLimit]="byteSizeLimit"
     ></app-file-attachment>

@@ -47,7 +47,7 @@
 
   <ng-container matColumnDef="size">
     <th mat-header-cell *matHeaderCellDef>Size</th>
-    <td mat-cell *matCellDef="let element" [class.warn]="hasInvalidSize(element)" class="size">{{ element.byteSize | fileSize }}</td>
+    <td mat-cell *matCellDef="let element" [class.warn]="hasInvalidSize(element)" class="info">{{ element.byteSize | fileSize }}</td>
   </ng-container>
 
   <ng-container matColumnDef="date">
@@ -93,7 +93,7 @@
 
   <ng-container matColumnDef="group">
     <th mat-header-cell *matHeaderCellDef>Group</th>
-    <td mat-cell *matCellDef="let element" class="size">{{ element.groupName }}</td>
+    <td mat-cell *matCellDef="let element" class="info">{{ element.groupName }}</td>
   </ng-container>
 
   <ng-container matColumnDef="type">

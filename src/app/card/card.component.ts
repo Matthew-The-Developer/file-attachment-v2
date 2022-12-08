@@ -9,7 +9,6 @@ import { FileAttachmentComponent } from '../shared/file-attachment/file-attachme
   styleUrls: ['./card.component.scss']
 })
 export class CardComponent implements OnInit {
-  options: FileRequestOptions = { attachmentWorkItemID: 29 };
   byteSizeLimit = 2 * 1024 * 1024;
   minDocumentDate = new Date('2/1/2022');
 

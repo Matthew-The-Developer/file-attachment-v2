@@ -233,15 +233,19 @@ export class FileService {
     }
   }
 
-  getFileGroups(workItemId: number): Observable<FileGroupType[]> {
-    const groupIDs = this.workItemMap.get(workItemId)!;
-    if (groupIDs.length > 0) {
-      return this._groups.asObservable().pipe(
-        map(groups => groups.filter(group => groupIDs.includes(group.groupID))),
-        delay(3000)
-      );
-    } else {
-      return this._groups.asObservable().pipe(delay(5000));
+  getFileGroups(workItemId?: number): Observable<FileGroupType[]> {
+    
+
+    if (workItemId) {
+      const groupIDs = this.workItemMap.get(workItemId)!;
+
+      if (groupIDs.length > 0) {
+        return this._groups.asObservable().pipe(
+          map(groups => groups.filter(group => groupIDs.includes(group.groupID))),
+          delay(3000)
+        );
+      }
     }
+    return this._groups.asObservable().pipe(delay(5000));
   }
 }
